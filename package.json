@@ -22,7 +22,6 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
-		"@netlify/blobs": "^10.7.9",
-		"astronomy-engine": "^2.1.19"
+		"@netlify/blobs": "^10.7.9"
 	}
 }
