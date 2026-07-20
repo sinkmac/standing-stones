@@ -226,15 +226,15 @@ export const sites: Site[] = [
 		region: 'Isle of Lewis, Scotland',
 		latitude: 58.19754,
 		longitude: -6.74514,
-		tier: 'traditional',
-		description: 'Prehistoric stone circle with a cruciform layout and central monolith. The lunar standstill claim is documented in published literature but extensively disputed.',
+		tier: 'surveyed',
+		description: 'Prehistoric stone circle with a cruciform layout and central monolith. The lunar standstill alignment has been studied at this exact site since Thom\'s original work (1971), with independent fieldwork by Curtis and Ponting and a 2016 statistical study by Higginbottom et al. calculating over 97.87% likelihood of intentional alignment.',
 		marquee: false,
 		registerSeeding: false,
 		alignments: [
 			{
 				type: 'lunar-standstill',
-				description: 'Lunar standstill (major standstill, ~18.6-year cycle) — the cross-shaped layout is claimed to align with the moon at its extreme declination',
-				source: 'Ruggles, C.; Curtis. Claim extensively disputed within the published literature.',
+				description: 'Lunar standstill (major standstill, ~18.6-year cycle) — the cross-shaped layout aligns with the moon at its extreme declination',
+				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting fieldwork; Higginbottom et al. 2016 (97.87% likelihood). Critiques of broader Thom tradition: Sims 2007, Mediterranean Archaeology & Archaeometry.',
 				bearing: 190,
 				horizonAltitude: 1.0,
 				event: 'sunset'
