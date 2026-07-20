@@ -1,6 +1,7 @@
 import { getSite } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
 import { getVigilsForSite, getSiteVigilStats, type VigilEntry } from '$lib/server/vigil';
+import { calculateAncestralSky, type AncestralSkyResult } from '$lib/server/ancestral';
 
 export interface SitePageData {
 	site: NonNullable<ReturnType<typeof getSite>>;
@@ -16,6 +17,7 @@ export interface SitePageData {
 	vigilStats: ReturnType<typeof getSiteVigilStats>;
 	recentVigils: VigilEntry[];
 	skySummary: { sunrise: string; sunset: string; sunlight: string };
+	ancestralSky: AncestralSkyResult | null;
 }
 
 export async function load({ params }): Promise<SitePageData | { error: string }> {
@@ -51,11 +53,17 @@ export async function load({ params }): Promise<SitePageData | { error: string }
 
 	const skySummary = getLocationSkySummary(site.latitude, site.longitude, now);
 
+	// Ancestral-sky calculation (only for eligible sites)
+	const ancestralSky = site.dateConfidence && site.tier === 'surveyed'
+		? calculateAncestralSky(site.slug, site.latitude, site.dateConfidence)
+		: null;
+
 	return {
 		site,
 		nextEvents,
 		vigilStats,
 		recentVigils: recentVigils.slice(0, 10),
-		skySummary
+		skySummary,
+		ancestralSky
 	};
 }

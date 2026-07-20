@@ -1,7 +1,8 @@
 // Site canon data — source of truth for the initial 6 sites
 
-export type ProvenanceTier = 'surveyed' | 'traditional';
+import type { DateConfidenceTier } from './ancestral';
 
+export type ProvenanceTier = 'surveyed' | 'traditional';
 export type AlignmentType = 'summer-solstice' | 'winter-solstice' | 'equinox' | 'lunar-standstill';
 
 export interface Alignment {
@@ -56,8 +57,12 @@ export interface Site {
 	marquee: boolean;
 	/** Is this a register-seeding site (open access, generates vigils)? */
 	registerSeeding: boolean;
-	/** Construction date range for ancestral-sky (if applicable) */
-	constructionDate?: { circa: number; range: number; singlePhase: boolean };
+	/**
+	 * Construction-date-confidence tier — separate axis from alignment-geometry
+	 * confidence. Both must be at max confidence for ancestral-sky pilot eligibility.
+	 * Three-valued: 'eligible' | 'not-applicable' | 'unknown'
+	 */
+	dateConfidence?: DateConfidenceTier;
 }
 
 export const sites: Site[] = [
@@ -146,7 +151,7 @@ export const sites: Site[] = [
 			openAccess: false,
 			lastVerified: '2026-07-20'
 		},
-		constructionDate: { circa: 2800, range: 100, singlePhase: true }
+		dateConfidence: { type: 'eligible', circaYear: -2800, range: 100, evidence: 'Single-phase Neolithic chambered cairn, securely dated within Orkney Neolithic chronology.' }
 	},
 	{
 		slug: 'newgrange',
@@ -176,7 +181,7 @@ export const sites: Site[] = [
 			openAccess: false,
 			lastVerified: '2026-07-20'
 		},
-		constructionDate: { circa: 3100, range: 100, singlePhase: true }
+		dateConfidence: { type: 'eligible', circaYear: -3100, range: 100, evidence: 'Single-phase passage tomb, securely dated via O\'Kelly (1982) and subsequent archaeology.' }
 	},
 	{
 		slug: 'stonehenge',
@@ -242,7 +247,7 @@ export const sites: Site[] = [
 			openAccess: true,
 			lastVerified: '2026-07-20'
 		},
-		constructionDate: { circa: 2750, range: 200, singlePhase: false }
+		dateConfidence: { type: 'not-applicable', circaYear: -2750, range: 200, evidence: 'Multi-axial layout suggests a longer use period; single-phase date is not established. Held as provisional for ancestral-sky.' }
 	}
 ];
 

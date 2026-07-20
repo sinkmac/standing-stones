@@ -50,7 +50,7 @@ export async function GET({ params }) {
 			marquee: site.marquee,
 			registerSeeding: site.registerSeeding,
 			access: site.access,
-			constructionDate: site.constructionDate
+			dateConfidence: site.dateConfidence
 		},
 		nextEvents,
 		vigilStats,

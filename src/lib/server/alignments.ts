@@ -1,6 +1,18 @@
 // Solar solver — standalone implementation of celestial mechanics
-// No external dependencies. Implements the well-known NOAA/ESA algorithms
-// for solstice/equinox dates, sunrise/sunset times, and sun position.
+// No external dependencies.
+//
+// Reference algorithm: NOAA Solar Calculator (Cornwall et al.),
+// https://gml.noaa.gov/grad/solcalc/ — implements the standard
+// astronomical algorithms from Jean Meeus, "Astronomical Algorithms"
+// (2nd ed., Willmann-Bell, 1998) for:
+//   - Julian date conversions
+//   - Solar position (ecliptic longitude → right ascension/declination)
+//   - Sunrise/sunset (US Naval Observatory method with -50' refraction)
+//   - Solstice/equinox (binary search for target ecliptic longitude)
+//
+// Uses the same precession/epoch model as Meeus Chapter 22, without
+// the nutation corrections (sub-arcsecond precision not needed when
+// the output is human-readable ranges)
 
 // === Constants ===
 

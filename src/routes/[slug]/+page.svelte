@@ -56,6 +56,7 @@
 	let hasAlignment = $derived(site.alignments.length > 0);
 	let isFolklore = $derived(site.tier === 'traditional');
 	let hasError = $derived('error' in data);
+	let ancestralSky = $derived(data.ancestralSky);
 </script>
 
 <svelte:head>
@@ -131,7 +132,21 @@
 		{/if}
 	</section>
 
-	<!-- VIGIL STATS -->
+	<!-- ANCESTRAL-SKY DRIFT (only for eligible sites) -->
+		{#if ancestralSky}
+			<section class="ancestral-sky">
+				<h2>Ancestral sky</h2>
+				<p class="guardrail">{ancestralSky.guardrail}</p>
+				<div class="band-description">
+					<p><strong>Drift across the construction window:</strong> {ancestralSky.bandDescription}</p>
+				</div>
+				{#if ancestralSky.scrubAvailable}
+					<p class="scrub-note">The optional date scrub control can show specific star positions within this window.</p>
+				{/if}
+			</section>
+		{/if}
+
+		<!-- VIGIL STATS -->
 	{#if vigilStats.total > 0}
 		<section class="vigil-stats">
 			<h2>Vigil register</h2>
@@ -511,5 +526,41 @@
 	.error {
 		text-align: center;
 		padding: 2rem;
+	}
+
+	.ancestral-sky {
+		margin-bottom: 1.5rem;
+		padding: 0.75rem;
+		background: #eeecf0;
+		border-radius: 4px;
+		border-left: 3px solid #9a8ab0;
+	}
+
+	.ancestral-sky h2 {
+		font-size: 1.1rem;
+		margin: 0 0 0.5rem 0;
+	}
+
+	.guardrail {
+		font-size: 0.85rem;
+		font-style: italic;
+		color: #5a4a7a;
+		margin: 0 0 0.5rem 0;
+		line-height: 1.5;
+	}
+
+	.band-description {
+		font-size: 0.9rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.band-description p {
+		margin: 0;
+	}
+
+	.scrub-note {
+		font-size: 0.8rem;
+		color: #7a7670;
+		margin: 0.25rem 0 0 0;
 	}
 </style>
