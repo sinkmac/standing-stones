@@ -18,7 +18,7 @@ export interface SitePageData {
 	skySummary: { sunrise: string; sunset: string; sunlight: string };
 }
 
-export function load({ params }): SitePageData | { error: string } {
+export async function load({ params }): Promise<SitePageData | { error: string }> {
 	const site = getSite(params.slug);
 	if (!site) {
 		return { error: 'Site not found' };
@@ -44,15 +44,18 @@ export function load({ params }): SitePageData | { error: string } {
 		})
 		.filter((e): e is NonNullable<typeof e> => e !== null);
 
-	const vigilStats = getSiteVigilStats(site.slug);
-	const recentVigils = getVigilsForSite(site.slug).slice(0, 10);
+	const [vigilStats, recentVigils] = await Promise.all([
+		getSiteVigilStats(site.slug),
+		getVigilsForSite(site.slug)
+	]);
+
 	const skySummary = getLocationSkySummary(site.latitude, site.longitude, now);
 
 	return {
 		site,
 		nextEvents,
 		vigilStats,
-		recentVigils,
+		recentVigils: recentVigils.slice(0, 10),
 		skySummary
 	};
 }

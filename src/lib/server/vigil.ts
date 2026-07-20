@@ -1,61 +1,128 @@
-// Vigil register — data model for recording visits to alignment sites
-// In-memory store for initial build; swap to Netlify Blobs for persistence later.
+// Vigil register — persistent storage via Netlify Blobs, with in-memory fallback for local dev
+// Store type: site-scoped (survives redeploys) — entries accumulate over years
+
+import { getStore } from '@netlify/blobs';
 
 export interface VigilEntry {
 	id: string;
 	siteSlug: string;
-	/** Date of the visit */
-	visitDate: string; // ISO date
-	/** Time of the vigil (optional) */
+	visitDate: string;
 	visitTime?: string;
-	/** The alignment they came to see */
 	alignmentType: string;
-	/** Did they see it? */
-	sawEvent: boolean | null; // null = uncertain
-	/** What they observed (free text, required) */
+	sawEvent: boolean | null;
 	observation: string;
-	/** Weather conditions */
 	weather: 'clear' | 'partly-cloudy' | 'overcast' | 'rain' | 'other';
-	/** Name/display name (optional) */
 	keeperName?: string;
-	/** Timestamp of the entry */
-	createdAt: string; // ISO datetime
+	createdAt: string;
 }
 
-// In-memory store — replace with persistent store
-let entries: VigilEntry[] = [];
+// In-memory fallback for local dev
+let memoryStore: VigilEntry[] = [];
+
+/**
+ * Determine if we can use Netlify Blobs (production) or need in-memory fallback (local dev).
+ */
+function canUseBlobs(): boolean {
+	try {
+		// Check for Netlify environment
+		return typeof process !== 'undefined' &&
+			(process.env.NETLIFY === 'true' || process.env.NODE_ENV === 'production');
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * Get the store instance. Returns null if unavailable.
+ */
+function getVigilStore() {
+	try {
+		return getStore('vigil-register');
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * Generate a unique ID for a vigil entry.
+ */
+function generateId(): string {
+	return crypto.randomUUID();
+}
+
+/**
+ * Load all entries from persistent store.
+ */
+async function loadEntries(): Promise<VigilEntry[]> {
+	if (canUseBlobs()) {
+		const store = getVigilStore();
+		if (store) {
+			try {
+				const data = await store.get('entries', { type: 'json' });
+				if (data && Array.isArray(data)) {
+					return data as VigilEntry[];
+				}
+			} catch {
+				// Blob read failed — fall back
+			}
+		}
+	}
+	return memoryStore;
+}
+
+/**
+ * Save all entries to persistent store.
+ */
+async function saveEntries(entries: VigilEntry[]): Promise<void> {
+	if (canUseBlobs()) {
+		const store = getVigilStore();
+		if (store) {
+			try {
+				await store.setJSON('entries', entries);
+				return;
+			} catch {
+				// Blob write failed — fall back to memory
+			}
+		}
+	}
+	memoryStore = entries;
+}
 
 /**
  * Record a new vigil entry.
  */
-export function recordVigil(entry: Omit<VigilEntry, 'id' | 'createdAt'>): VigilEntry {
+export async function recordVigil(entry: Omit<VigilEntry, 'id' | 'createdAt'>): Promise<VigilEntry> {
+	const entries = await loadEntries();
 	const newEntry: VigilEntry = {
 		...entry,
-		id: crypto.randomUUID(),
+		id: generateId(),
 		createdAt: new Date().toISOString()
 	};
-	entries = [newEntry, ...entries];
+	entries.unshift(newEntry);
+	await saveEntries(entries);
 	return newEntry;
 }
 
 /**
  * Get all vigil entries for a site.
  */
-export function getVigilsForSite(siteSlug: string): VigilEntry[] {
-	return entries.filter(e => e.siteSlug === siteSlug).sort(
-		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-	);
+export async function getVigilsForSite(siteSlug: string): Promise<VigilEntry[]> {
+	const entries = await loadEntries();
+	return entries
+		.filter(e => e.siteSlug === siteSlug)
+		.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 /**
  * Get the seen/attempted ratio for a site.
  */
-export function getSiteVigilStats(siteSlug: string): {
+export async function getSiteVigilStats(siteSlug: string): Promise<{
 	total: number;
 	seen: number;
 	notSeen: number;
-	ratio: number | null; // percentage, null if no entries
-} {
+	ratio: number | null;
+}> {
+	const entries = await loadEntries();
 	const siteEntries = entries.filter(e => e.siteSlug === siteSlug);
 	if (siteEntries.length === 0) {
 		return { total: 0, seen: 0, notSeen: 0, ratio: null };
@@ -76,8 +143,9 @@ export function getSiteVigilStats(siteSlug: string): {
 /**
  * Get all vigil entries across all sites.
  */
-export function getAllVigils(): VigilEntry[] {
-	return [...entries].sort(
+export async function getAllVigils(): Promise<VigilEntry[]> {
+	const entries = await loadEntries();
+	return entries.sort(
 		(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 	);
 }
@@ -85,7 +153,8 @@ export function getAllVigils(): VigilEntry[] {
 /**
  * Get the count of keepers for a specific upcoming alignment event.
  */
-export function getKeepersForAlignment(siteSlug: string, alignmentType: string): number {
+export async function getKeepersForAlignment(siteSlug: string, alignmentType: string): Promise<number> {
+	const entries = await loadEntries();
 	return entries.filter(
 		e => e.siteSlug === siteSlug && e.alignmentType === alignmentType
 	).length;
@@ -95,8 +164,15 @@ export function getKeepersForAlignment(siteSlug: string, alignmentType: string):
  * Format a vigil entry for display.
  */
 export function formatVigilEntry(entry: VigilEntry): string {
-	const status = entry.sawEvent === true ? 'Saw it ✓' : entry.sawEvent === false ? 'Didn\'t see it' : 'Uncertain';
-	const weather = entry.weather === 'clear' ? 'Clear' : entry.weather === 'partly-cloudy' ? 'Partly cloudy' : entry.weather === 'overcast' ? 'Overcast' : entry.weather === 'rain' ? 'Rain' : 'Other';
+	const status = entry.sawEvent === true ? 'Saw it ✓' :
+		entry.sawEvent === false ? 'Didn\'t see it' : 'Uncertain';
+	const weatherLabels: Record<string, string> = {
+		'clear': 'Clear',
+		'partly-cloudy': 'Partly cloudy',
+		'overcast': 'Overcast',
+		'rain': 'Rain',
+		'other': 'Other'
+	};
 	const visitDate = new Date(entry.visitDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-	return `${visitDate}${entry.visitTime ? ' at ' + entry.visitTime : ''} — ${status}, ${weather}\n"${entry.observation}"`;
+	return `${visitDate}${entry.visitTime ? ' at ' + entry.visitTime : ''} — ${status}, ${weatherLabels[entry.weather] || entry.weather}\n"${entry.observation}"`;
 }

@@ -224,7 +224,7 @@ export const sites: Site[] = [
 		tier: 'traditional',
 		description: 'Prehistoric stone circle with a cruciform layout and central monolith. The lunar standstill claim is documented in published literature but extensively disputed.',
 		marquee: false,
-		registerSeeding: true,
+		registerSeeding: false,
 		alignments: [
 			{
 				type: 'lunar-standstill',

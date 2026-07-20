@@ -2,6 +2,5 @@
   command = "npm run build"
   publish = ".svelte-kit/output"
 
-[[edge_functions]]
-  function = "netlify-edge-handler"
-  path = "/*"
+[build.environment]
+  NODE_VERSION = "22"

@@ -3,7 +3,7 @@ import { getSite } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
 import { getVigilsForSite, getSiteVigilStats } from '$lib/server/vigil';
 
-export function GET({ params }) {
+export async function GET({ params }) {
 	const site = getSite(params.slug);
 	if (!site) {
 		return json({ error: 'Site not found' }, { status: 404 });
@@ -31,8 +31,10 @@ export function GET({ params }) {
 		.filter(Boolean);
 
 	// Get vigil stats
-	const vigilStats = getSiteVigilStats(site.slug);
-	const recentVigils = getVigilsForSite(site.slug).slice(0, 10);
+	const [vigilStats, recentVigils] = await Promise.all([
+		getSiteVigilStats(site.slug),
+		getVigilsForSite(site.slug)
+	]);
 
 	// Get sky summary for no-alignment fallback
 	const skySummary = getLocationSkySummary(site.latitude, site.longitude, now);
@@ -52,7 +54,7 @@ export function GET({ params }) {
 		},
 		nextEvents,
 		vigilStats,
-		recentVigils,
+		recentVigils: recentVigils.slice(0, 10),
 		skySummary
 	});
 }
