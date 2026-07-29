@@ -32,6 +32,13 @@ export interface AccessInfo {
 	lastVerified: string;
 }
 
+export interface EnrichmentContent {
+	/** Curated dark-sky sentence for this site. Leads with closure on managed-access sites. */
+	darkSky: string;
+	/** How to get from where you leave the car to where you stand. Nullable — prose only, never coordinates. */
+	approach: string;
+}
+
 export interface Site {
 	/** URL-friendly slug */
 	slug: string;
@@ -63,6 +70,8 @@ export interface Site {
 	 * Three-valued: 'eligible' | 'not-applicable' | 'unknown'
 	 */
 	dateConfidence?: DateConfidenceTier;
+	/** Enrichment bundle — dark sky and approach content */
+	enrichment?: EnrichmentContent;
 }
 
 export const sites: Site[] = [
@@ -76,6 +85,10 @@ export const sites: Site[] = [
 		description: 'Three standing stones aligned with the midsummer sunset over the Isle of Jura. Alexander Thom\'s key alignment site.',
 		marquee: false,
 		registerSeeding: true,
+		enrichment: {
+			approach: 'Park at the A83 bridge, or the beach layby just south. The farm track is unsignposted — the landmark is a barn with a red roof. Ten to twenty minutes on foot depending on where you get parked, uphill on rough track. The stones aren\'t visible from the road until you\'re nearly on them. Working farm: gates closed, dogs on leads.',
+			darkSky: 'Very little artificial light on this stretch of the Kintyre coast, and the sea horizon west towards Jura is unlit. No formal dark-sky designation here — just a quiet road and a long way to the nearest town.'
+		},
 		alignments: [
 			{
 				type: 'summer-solstice',
@@ -105,6 +118,10 @@ export const sites: Site[] = [
 		description: 'A 13-stone axial circle with a SW axis framing the midwinter sunset. Among the most visited megalithic sites in Ireland.',
 		marquee: false,
 		registerSeeding: true,
+		enrichment: {
+			approach: 'Small car park at the end of the lane, room for about ten cars. Two to five minutes on a maintained path with a slight rise. Exposed, and often wet underfoot.',
+			darkSky: 'Rural West Cork with the Atlantic to the south. Glandore and Rosscarbery put a little light into the eastern sky; the seaward side stays dark.'
+		},
 		alignments: [
 			{
 				type: 'winter-solstice',
@@ -134,6 +151,10 @@ export const sites: Site[] = [
 		description: 'Neolithic chambered cairn aligned so that sunlight enters the passage at the winter solstice sunset. Part of the Heart of Neolithic Orkney UNESCO site.',
 		marquee: false,
 		registerSeeding: true,
+		enrichment: {
+			approach: 'Guided tour only, booked ahead, departing on the hour from the visitor centre at Stenness. A five-minute shuttle, then about 400 metres on foot — gravel, stone and uneven grass, two latch gates, a crossing of a busy main road, and a short steep slope at the entrance. Open daily. To be in the chamber for the midwinter sunset, book the 2pm tour — only possible in the six weeks or so either side of the solstice.',
+			darkSky: 'Access ends with the last tour at 4pm, so the mound itself is never seen after dark. Orkney beyond it has very little light pollution — over twelve hours of true dark around midwinter, no darkness at all from May to July, and the Merry Dancers most likely between October and March.'
+		},
 		alignments: [
 			{
 				type: 'winter-solstice',
@@ -164,6 +185,10 @@ export const sites: Site[] = [
 		description: 'Neolithic passage tomb with a roofbox aligned to the winter solstice sunrise. Older than Stonehenge and the Egyptian pyramids.',
 		marquee: true,
 		registerSeeding: false,
+		enrichment: {
+			approach: 'No walk-in access. Every visit starts at the Brú na Bóinne visitor centre, about five minutes on foot to the shuttle pick-up across the footbridge, then a shuttle bus to the mound. Guided tour only, pre-booking essential, and the solstice mornings are allocated by lottery.',
+			darkSky: 'No after-hours access — the solstice mornings, by lottery, are the only exception. The Boyne Valley around it is farmland, dark but for a lift from Drogheda to the east; any night sky here is seen from the surrounding lanes, not the mound.'
+		},
 		alignments: [
 			{
 				type: 'winter-solstice',
@@ -193,6 +218,10 @@ export const sites: Site[] = [
 		description: 'The most famous megalithic monument in the world. Its solstitial axis is one of the most surveyed alignments in archaeoastronomy.',
 		marquee: true,
 		registerSeeding: false,
+		enrichment: {
+			approach: 'Shuttle from the visitor centre, about ten minutes each way, running every few minutes, year-round. Or a walk-in of twenty-five to thirty-five minutes, about a mile and a half across the landscape.',
+			darkSky: 'The stones close at night. Cranborne Chase, an International Dark Sky Reserve since 2019, begins a short way south — Stonehenge itself sits just outside its boundary, with the A303 running close by.'
+		},
 		alignments: [
 			{
 				type: 'summer-solstice',
@@ -230,6 +259,10 @@ export const sites: Site[] = [
 		description: 'Prehistoric stone circle with a cruciform layout and central monolith. The lunar standstill alignment has been studied at this exact site since Thom\'s original work (1971), with independent fieldwork by Curtis and Ponting and a 2016 statistical study by Higginbottom et al. calculating over 97.87% likelihood of intentional alignment.',
 		marquee: false,
 		registerSeeding: false,
+		enrichment: {
+			approach: 'Free car park next to the visitor centre. Two to five minutes uphill on uneven ground to the stones. The visitor centre and café are open Monday to Saturday, closed Sunday. The stones themselves stand open at any hour, every day of the year.',
+			darkSky: 'Among the darkest skies in Britain, with no formal designation and little need for one — the island is largely unlit. No true darkness from late May into July; aurora possible September through April.'
+		},
 		alignments: [
 			{
 				type: 'lunar-standstill',

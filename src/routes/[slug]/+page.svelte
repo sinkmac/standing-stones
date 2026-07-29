@@ -97,6 +97,22 @@
 		{/if}
 	</div>
 
+	<!-- THE APPROACH -->
+	{#if site.enrichment?.approach}
+		<div class="enrichment-approach">
+			<h3>The approach</h3>
+			<p>{site.enrichment.approach}</p>
+		</div>
+	{/if}
+
+	<!-- DARK SKY -->
+	{#if site.enrichment?.darkSky}
+		<div class="enrichment-dark-sky">
+			<h3>Dark sky</h3>
+			<p>{site.enrichment.darkSky}</p>
+		</div>
+	{/if}
+
 	<!-- COUNTDOWN SECTION -->
 	<section class="countdown">
 		<h2>Next alignment</h2>
@@ -562,5 +578,44 @@
 		font-size: 0.8rem;
 		color: #7a7670;
 		margin: 0.25rem 0 0 0;
+	}
+
+	.enrichment-approach {
+		font-size: 0.85rem;
+		color: #5a5550;
+		margin-bottom: 1.5rem;
+		padding: 0.75rem;
+		background: #f4f2ee;
+		border-radius: 4px;
+	}
+
+	.enrichment-approach h3 {
+		margin: 0 0 0.25rem 0;
+		font-size: 0.9rem;
+		color: #3a3a3a;
+	}
+
+	.enrichment-approach p {
+		margin: 0;
+	}
+
+	.enrichment-dark-sky {
+		font-size: 0.85rem;
+		color: #5a5550;
+		margin-bottom: 1.5rem;
+		padding: 0.75rem;
+		background: #f0f0ec;
+		border-radius: 4px;
+		border-left: 3px solid #9a9a8a;
+	}
+
+	.enrichment-dark-sky h3 {
+		margin: 0 0 0.25rem 0;
+		font-size: 0.9rem;
+		color: #3a3a3a;
+	}
+
+	.enrichment-dark-sky p {
+		margin: 0;
 	}
 </style>
