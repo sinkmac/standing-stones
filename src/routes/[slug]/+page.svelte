@@ -704,11 +704,11 @@
 	}
 
 	.enrichment-dark-sky.sky-dark h3 {
-		color: #c8d8e8;
+		color: #dce8f0;
 	}
 
 	.enrichment-dark-sky.sky-dark p {
-		color: #8faec4;
+		color: #a0bcd0;
 		transition: color 0.8s ease;
 	}
 
