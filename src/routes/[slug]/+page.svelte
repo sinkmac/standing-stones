@@ -703,11 +703,11 @@
 		border-left-color: #3a4a60;
 	}
 
-	.enrichment-dark-sky.sky-dark h3 {
+	:global(.enrichment-dark-sky.sky-dark) h3 {
 		color: #dce8f0;
 	}
 
-	.enrichment-dark-sky.sky-dark p {
+	:global(.enrichment-dark-sky.sky-dark) p {
 		color: #a0bcd0;
 		transition: color 0.8s ease;
 	}
