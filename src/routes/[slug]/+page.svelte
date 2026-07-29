@@ -56,7 +56,82 @@
 	let hasAlignment = $derived(site.alignments.length > 0);
 	let isFolklore = $derived(site.tier === 'traditional');
 	let hasError = $derived('error' in data);
-	let ancestralSky = $derived(data.ancestralSky);
+		let ancestralSky = $derived(data.ancestralSky);
+
+	$effect(() => {
+		// Dark-sky section: toggle .sky-dark on scroll
+		const skyEl = document.querySelector('.enrichment-dark-sky');
+		if (skyEl) {
+			const field = document.createElement('div');
+			field.className = 'star-field';
+			for (let i = 0; i < 28; i++) {
+				const s = document.createElement('div');
+				s.className = 'star';
+				s.style.left = Math.random() * 100 + '%';
+				s.style.top = Math.random() * 100 + '%';
+				s.style.opacity = (0.3 + Math.random() * 0.7).toFixed(2);
+				s.style.width = s.style.height = Math.random() > 0.7 ? '3px' : '2px';
+				field.appendChild(s);
+			}
+			skyEl.prepend(field);
+		}
+
+		const skyObs = new IntersectionObserver((entries) => {
+			entries.forEach(e => {
+				if (e.intersectionRatio >= 0.3) {
+					e.target.classList.add('sky-dark');
+				} else {
+					e.target.classList.remove('sky-dark');
+				}
+			});
+		}, { threshold: [0.3, 0.5] });
+
+		if (skyEl) skyObs.observe(skyEl);
+
+		// Countdown: fade-in on first scroll
+		let countdownDone = false;
+		const cdEl = document.querySelector('.countdown');
+		const cdObs = new IntersectionObserver((entries) => {
+			entries.forEach(e => {
+				if (e.isIntersecting && !countdownDone) {
+					countdownDone = true;
+					e.target.classList.remove('countdown-hidden');
+					animateDays(e.target);
+					cdObs.disconnect();
+				}
+			});
+		}, { threshold: 0.3 });
+
+		if (cdEl) cdObs.observe(cdEl);
+
+		function animateDays(cdEl) {
+			const badge = cdEl.querySelector('.event-badge');
+			if (!badge) return;
+			const match = badge.textContent.match(/(\d+)\/(\d+)\s+days/);
+			if (!match) return;
+			const target = parseInt(match[1], 10);
+			if (!target || target === 0) return;
+			const span = document.createElement('span');
+			span.textContent = '0';
+			badge.textContent = '';
+			badge.appendChild(span);
+			let start = null;
+			function tick(ts) {
+				if (!start) start = ts;
+				const p = Math.min((ts - start) / 1200, 1);
+				const ease = 1 - Math.pow(1 - p, 3);
+				span.textContent = Math.round(ease * target) + '/' + match[2] + ' days window';
+				if (p < 1) requestAnimationFrame(tick);
+				else span.textContent = match[1] + '/' + match[2] + ' days window';
+			}
+			requestAnimationFrame(tick);
+		}
+
+		return () => {
+			skyObs.disconnect();
+			cdObs.disconnect();
+		};
+	});
 </script>
 
 <svelte:head>
@@ -114,7 +189,7 @@
 	{/if}
 
 	<!-- COUNTDOWN SECTION -->
-	<section class="countdown">
+	<section class="countdown countdown-hidden">
 		<h2>Next alignment</h2>
 		{#if !hasAlignment}
 			<!--- NO-ALIGNMENT FALLBACK PROMPT -->
@@ -607,6 +682,9 @@
 		background: #f0f0ec;
 		border-radius: 4px;
 		border-left: 3px solid #9a9a8a;
+		transition: background 0.8s ease, border-color 0.8s ease;
+		position: relative;
+		overflow: hidden;
 	}
 
 	.enrichment-dark-sky h3 {
@@ -617,5 +695,46 @@
 
 	.enrichment-dark-sky p {
 		margin: 0;
+	}
+
+	.enrichment-dark-sky.sky-dark {
+		background: #0d1117;
+		border-color: #2a3040;
+		border-left-color: #3a4a60;
+	}
+
+	.enrichment-dark-sky.sky-dark h3 {
+		color: #4a5568;
+	}
+
+	.enrichment-dark-sky.sky-dark p {
+		color: #8a9bb5;
+		transition: color 0.8s ease;
+	}
+
+	.star-field {
+		position: absolute;
+		top: 0; left: 0; right: 0; bottom: 0;
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 1.2s ease;
+	}
+
+	.star-field .star {
+		position: absolute;
+		width: 2px;
+		height: 2px;
+		border-radius: 50%;
+		background: white;
+	}
+
+	.enrichment-dark-sky.sky-dark .star-field {
+		opacity: 1;
+	}
+
+	.countdown-hidden {
+		opacity: 0;
+		transform: translateY(16px);
+		transition: opacity 0.9s ease, transform 0.9s ease;
 	}
 </style>
