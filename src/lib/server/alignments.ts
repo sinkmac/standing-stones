@@ -135,10 +135,12 @@ function sunPosition(jd: number, latitude: number, longitude: number): { azimuth
 		Math.sin(latRad) * Math.sin(dec) + Math.cos(latRad) * Math.cos(dec) * Math.cos(hourAngle)
 	);
 
-	// Azimuth (from north, clockwise)
+	// Azimuth (from north, clockwise) — Meeus eq. 13.5 / NOAA.
+	// atan2(sin(HA), cos(HA)·sinφ − tanδ·cosφ) + 180. Negating BOTH atan2 args
+	// would cancel the +180 and silently return a from-South reading (~180° off).
 	const az = Math.atan2(
-		-Math.sin(hourAngle),
-		Math.tan(dec) * Math.cos(latRad) - Math.sin(latRad) * Math.cos(hourAngle)
+		Math.sin(hourAngle),
+		Math.cos(hourAngle) * Math.sin(latRad) - Math.tan(dec) * Math.cos(latRad)
 	);
 
 	return {
@@ -291,7 +293,12 @@ export function getSunriseSunset(
 	longitude: number,
 	event: 'sunrise' | 'sunset'
 ): { time: Date; azimuth: number } | null {
-	const jd = toJulian(date);
+	// Normalise to the start of the UTC day. calcSunriseSet adds a
+	// (12 − lon/15)/24 noon offset assuming its input is 00:00; if it is fed the
+	// solstice INSTANT (~noon), noon+12h double-counts and the event lands ~12h
+	// off. Normalising here makes the base 00:00 so the noon term is correct.
+	const dayStart = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+	const jd = toJulian(dayStart);
 	const eventJd = calcSunriseSet(jd, latitude, longitude, event);
 
 	if (eventJd === null) return null;
