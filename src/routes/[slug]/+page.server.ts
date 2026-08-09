@@ -1,3 +1,4 @@
+import { error } from '@sveltejs/kit';
 import { getSite } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
 import { getVigilsForSite, getSiteVigilStats, type VigilEntry } from '$lib/server/vigil';
@@ -14,16 +15,16 @@ export interface SitePageData {
 		windowDescription: string;
 		isPrecise: boolean;
 	}>;
-	vigilStats: ReturnType<typeof getSiteVigilStats>;
+	vigilStats: Awaited<ReturnType<typeof getSiteVigilStats>>;
 	recentVigils: VigilEntry[];
 	skySummary: { sunrise: string; sunset: string; sunlight: string };
 	ancestralSky: AncestralSkyResult | null;
 }
 
-export async function load({ params }): Promise<SitePageData | { error: string }> {
+export async function load({ params }): Promise<SitePageData> {
 	const site = getSite(params.slug);
 	if (!site) {
-		return { error: 'Site not found' };
+		error(404, 'Site not found');
 	}
 
 	const now = new Date();

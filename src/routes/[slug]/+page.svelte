@@ -55,8 +55,7 @@
 	// Check if this site has any alignment
 	let hasAlignment = $derived(site.alignments.length > 0);
 	let isFolklore = $derived(site.tier === 'traditional');
-	let hasError = $derived('error' in data);
-		let ancestralSky = $derived(data.ancestralSky);
+	let ancestralSky = $derived(data.ancestralSky);
 
 	$effect(() => {
 		// Dark-sky section: toggle .sky-dark on scroll
@@ -104,25 +103,27 @@
 
 		if (cdEl) cdObs.observe(cdEl);
 
-		function animateDays(cdEl) {
+		function animateDays(cdEl: Element) {
 			const badge = cdEl.querySelector('.event-badge');
-			if (!badge) return;
+			if (!badge || !badge.textContent) return;
 			const match = badge.textContent.match(/(\d+)\/(\d+)\s+days/);
 			if (!match) return;
 			const target = parseInt(match[1], 10);
 			if (!target || target === 0) return;
+			const totalLabel = match[2];
+			const finalLabel = match[1];
 			const span = document.createElement('span');
 			span.textContent = '0';
 			badge.textContent = '';
 			badge.appendChild(span);
-			let start = null;
-			function tick(ts) {
+			let start: number | null = null;
+			function tick(ts: number) {
 				if (!start) start = ts;
 				const p = Math.min((ts - start) / 1200, 1);
 				const ease = 1 - Math.pow(1 - p, 3);
-				span.textContent = Math.round(ease * target) + '/' + match[2] + ' days window';
+				span.textContent = Math.round(ease * target) + '/' + totalLabel + ' days window';
 				if (p < 1) requestAnimationFrame(tick);
-				else span.textContent = match[1] + '/' + match[2] + ' days window';
+				else span.textContent = finalLabel + '/' + totalLabel + ' days window';
 			}
 			requestAnimationFrame(tick);
 		}
@@ -137,14 +138,6 @@
 <svelte:head>
 	<title>{site.name} — Standing Stones & Alignments</title>
 </svelte:head>
-
-{#if hasError}
-	<div class="error">
-		<h1>Site not found</h1>
-		<p>{(data as { error: string }).error}</p>
-		<a href="/">← Back to all sites</a>
-	</div>
-{:else}
 
 	<a href="/" class="back-link">← All sites</a>
 
@@ -319,8 +312,6 @@
 			{/each}
 		</section>
 	{/if}
-
-{/if}
 
 <style>
 	.back-link {
