@@ -3,7 +3,7 @@
 import type { DateConfidenceTier } from './ancestral';
 
 export type ProvenanceTier = 'surveyed' | 'traditional';
-export type AlignmentType = 'summer-solstice' | 'winter-solstice' | 'equinox' | 'lunar-standstill';
+export type AlignmentType = 'summer-solstice' | 'winter-solstice' | 'equinox' | 'lunar-standstill' | 'lunar-lunistice-south';
 
 export interface Alignment {
 	type: AlignmentType;
@@ -268,6 +268,14 @@ export const sites: Site[] = [
 				type: 'lunar-standstill',
 				description: 'Lunar standstill (major standstill, ~18.6-year cycle) — the cross-shaped layout aligns with the moon at its extreme declination',
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting fieldwork; Higginbottom et al. 2016 (97.87% likelihood). Critiques of broader Thom tradition: Sims 2007, Mediterranean Archaeology & Archaeometry.',
+				bearing: 190,
+				horizonAltitude: 1.0,
+				event: 'sunset'
+			},
+			{
+				type: 'lunar-lunistice-south',
+				description: 'Monthly southern lunistice (~27.21-day draconic month) — at the moon\'s most southerly extent each month, its low moonrise skims the Sleeping Beauty ridge to the south; the southern stone row frames this event',
+				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting; Higginbottom et al. 2016. Monthly lunistice recognised as a recurring dawn within the standstill cycle.',
 				bearing: 190,
 				horizonAltitude: 1.0,
 				event: 'sunset'
