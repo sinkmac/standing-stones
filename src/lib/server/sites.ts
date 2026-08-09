@@ -153,7 +153,7 @@ export const sites: Site[] = [
 		registerSeeding: true,
 		enrichment: {
 			approach: 'Guided tour only, booked ahead, departing on the hour from the visitor centre at Stenness. A five-minute shuttle, then about 400 metres on foot — gravel, stone and uneven grass, two latch gates, a crossing of a busy main road, and a short steep slope at the entrance. Open daily. To be in the chamber for the midwinter sunset, book the 2pm tour — only possible in the six weeks or so either side of the solstice.',
-			darkSky: 'Access ends with the last tour at 4pm, so the mound itself is never seen after dark. Orkney beyond it has very little light pollution — over twelve hours of true dark around midwinter, no darkness at all from May to July, and the Merry Dancers most likely between October and March.'
+			darkSky: 'Managed timed-tour access only — the last tour of the day is 4pm. The winter solstice sunset falls at around 15:15 UTC, which lands inside the 2pm tour, so visitors are in the chamber as sunlight floods the passage. Booking ahead is essential: entry is by managed, limited-capacity timed tour, not open access. Orkney beyond the site has very little light pollution — over twelve hours of true dark around midwinter, no darkness at all from May to July, and the Merry Dancers most likely between October and March.'
 		},
 		alignments: [
 			{
