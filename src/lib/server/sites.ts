@@ -289,6 +289,65 @@ export const sites: Site[] = [
 			lastVerified: '2026-07-20'
 		},
 		dateConfidence: { type: 'not-applicable', circaYear: -2750, range: 200, evidence: 'Multi-axial layout suggests a longer use period; single-phase date is not established. Held as provisional for ancestral-sky.' }
+	},
+	{
+		slug: 'clava-cairns',
+		name: 'Balnuaran of Clava',
+		altName: 'Clava Cairns',
+		region: 'Highland, Scotland',
+		latitude: 57.473,
+		longitude: -4.074,
+		tier: 'surveyed',
+		description: 'Three Early Bronze Age passage-graves near Inverness, oriented to midwinter sunset. The passages align so the setting solstice sun shines directly into the chambers. Surveyed independently by Somerville (1910), MacKie (1975), and Bradley (2000).',
+		marquee: false,
+		registerSeeding: true,
+		alignments: [
+			{
+				type: 'winter-solstice',
+				description: 'Winter solstice sunset — the passage of the southwest cairn is oriented so the setting solstice sun shines directly down the corridor. Caveat: the alignment is a cemetery-wide orientation, not a single-point sightline; the southwest cairn is the primary observation point.',
+				source: 'Somerville, H.B. (1910); MacKie, E. (1975); Bradley, R. (2000) The Good Stones, Society of Antiquaries of Scotland monograph no. 17; Scott, D. (2016) Journal of Skyscape Archaeology Vol. 2 No. 1.',
+				bearing: 225,
+				horizonAltitude: 1.0,
+				event: 'sunset'
+			}
+		],
+		access: {
+			description: 'Managed by Historic Environment Scotland. Open access, free entry, no booking required.',
+			lottery: false,
+			managedAccess: false,
+			openAccess: true,
+			lastVerified: '2026-08-09'
+		},
+		dateConfidence: { type: 'not-applicable', circaYear: -2000, range: 200, evidence: 'Early Bronze Age passage-grave cemetery, dated c. 2000 BCE via Bradley (2000) The Good Stones excavation; multi-cairn cemetery — single-phase date not established.' }
+	},
+	{
+		slug: 'temple-wood',
+		name: 'Temple Wood',
+		region: 'Argyll, Scotland',
+		latitude: 56.124,
+		longitude: -5.499,
+		tier: 'surveyed',
+		description: 'Two adjacent stone circles in Kilmartin Glen, Argyll, dating to around 3500 BCE. A line through the circles and the northeast cairn aligns with midwinter sunset. Surveyed by Thom (1967), Ruggles (1984), and Scott (2009, Antiquity).',
+		marquee: false,
+		registerSeeding: true,
+		alignments: [
+			{
+				type: 'winter-solstice',
+				description: 'Winter solstice sunset — a line through the centre of the two circles and the northeast cairn points to the midwinter sunset in the southwest. Caveat: this is a landscape alignment running between the two circles and the Nether Largie cairn, not contained within a single structure; the southern circle is the primary observation point.',
+				source: 'Thom, A. (1967, 1971) Megalithic Sites in Britain; Ruggles, C. (1984); Scott, D. (2009) Antiquity.',
+				bearing: 227,
+				horizonAltitude: 1.0,
+				event: 'sunset'
+			}
+		],
+		access: {
+			description: 'Managed by Historic Environment Scotland. Open access, free entry, no booking required.',
+			lottery: false,
+			managedAccess: false,
+			openAccess: true,
+			lastVerified: '2026-08-09'
+		},
+		dateConfidence: { type: 'not-applicable', circaYear: -3500, range: 250, evidence: 'Stone circles dating to around 3500 BCE per Thom (1967) and Ruggles (1984) surveys; multi-structure complex — single-phase date not established.' }
 	}
 ];
 
