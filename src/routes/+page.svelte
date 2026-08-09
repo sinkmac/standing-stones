@@ -1,169 +1,202 @@
 <script lang="ts">
 	let { data } = $props();
 
-	let sites = $derived(data.sites);
-	let canonInfo = $derived(data.canonInfo);
+	let site = $derived(data.site);
+	let state = $derived(data.state);
 
-	function tierClass(tier: string) {
-		return tier === 'surveyed' ? 'badge-surveyed' : 'badge-traditional';
-	}
+	// Practical line: the seen/kept ratio once 3+ vigils are recorded,
+	// otherwise the site's practical copy. The ratio threshold is a design fact.
+	let practicalLine = $derived(data.seenKeptRatio ?? site.practicalLine);
+
+	let skyStyle = $derived(
+		site.showSky
+			? [1, 2, 3, 4, 5, 6]
+					.map((n) => `--sky-band-${n}:${site.skyBands[n - 1]}`)
+					.join(';')
+			: ''
+	);
 </script>
 
 <svelte:head>
-	<title>Standing Stones & Alignments — Sites</title>
+	<title>Standing Stones &amp; Alignments — vigil register</title>
+	<meta
+		name="description"
+		content="Countdowns to the next alignment at seven ancient sites, and a register of every vigil kept — including the ones that saw nothing."
+	/>
 </svelte:head>
 
-<h1>Standing Stones & Alignments</h1>
-<p class="subtitle">Keep the vigil. Record what you see. Non-events are valid.</p>
+<div class="landing" style="--font-voice: Georgia, 'Times New Roman', Times, serif">
+	<div class="wordmark">
+		<span class="wm-title">standing stones</span>
+		<span class="wm-scope" aria-label="scope">seven sites · vigil register</span>
+	</div>
 
-<div class="canon-info">
-	<p>
-		<span class="label">Initial canon:</span>
-		{canonInfo.total} sites —
-		{canonInfo.surveyed} surveyed/published research,
-		{canonInfo.traditional} traditional/folklore
-	</p>
-</div>
+	{#if site.showSky}
+		<div class="sky" style={skyStyle} role="img" aria-label="Illustrated banded sky over {site.id} at its alignment">
+			<div class="band" style="background: var(--sky-band-1)"></div>
+			<div class="band" style="background: var(--sky-band-2)"></div>
+			<div class="band" style="background: var(--sky-band-3)"></div>
+			<div class="band" style="background: var(--sky-band-4)"></div>
+			<div class="band" style="background: var(--sky-band-5)"></div>
+			<div class="band" style="background: var(--sky-band-6)"></div>
+			<svg class="silhouette" viewBox="0 0 1200 110" preserveAspectRatio="none" aria-hidden="true">
+				<path
+					d="M0 110 L0 96 L52 92 L52 110 Z
+					   M150 110 L150 70 L196 66 L196 110 Z
+					   M246 110 L246 84 L290 82 L290 110 Z
+					   M360 110 L360 88 L416 84 L416 110 Z
+					   M560 110 L560 58 L620 54 L620 110 Z
+					   M672 110 L672 78 L716 76 L716 110 Z
+					   M780 110 L780 92 L836 88 L836 110 Z
+					   M980 110 L980 64 L1036 60 L1036 110 Z
+					   M1090 110 L1090 84 L1136 82 L1136 110 Z
+					   L1200 110 Z"
+					fill="#0a0d12"
+				/>
+			</svg>
+		</div>
+	{/if}
 
-<div class="site-list">
-	{#each sites as site}
-		<a href="/{site.slug}" class="site-card">
-			<div class="card-header">
-				<h2>{site.name}</h2>
-				<span class="tier-badge {tierClass(site.tier)}">{site.tier}</span>
-				{#if site.marquee}
-					<span class="badge-marquee">marquee</span>
-				{/if}
-				{#if site.registerSeeding}
-					<span class="badge-seeding">vigil site</span>
-				{/if}
-			</div>
-			<p class="region">{site.region}</p>
-			<p class="description">{site.description}</p>
-			<div class="alignments">
-				{#each site.alignments as a}
-					<span class="alignment-tag">{a.type.replace('-', ' ')}</span>
-				{/each}
-			</div>
-		</a>
-	{/each}
+	<main>
+		<p class="hero">{site.sentence}</p>
+		<p class="practical">{practicalLine}</p>
+
+		<div class="countdown-row">
+			{#if site.daysUntil != null && site.withinWindow}
+				<p class="countdown">this week</p>
+			{:else if site.daysUntil != null}
+				<p class="countdown">{site.daysUntil} days</p>
+			{/if}
+			<a class="cta" href="/{site.id}">Keep the vigil</a>
+		</div>
+
+		<div class="orientation">
+			<p>Countdowns to the next alignment at seven ancient sites.</p>
+			<p>A register of every vigil kept, including the ones that saw nothing.</p>
+			<p>Timing given in ranges. These are broad events, not instants.</p>
+		</div>
+
+		<p class="routing">Seven sites keep a <a href="/register">register</a>.</p>
+	</main>
 </div>
 
 <style>
-	.subtitle {
+	.landing {
+		--font-voice: Georgia, 'Times New Roman', Times, serif;
+	}
+
+	/* 1. Wordmark bar */
+	.wordmark {
+		display: flex;
+		justify-content: space-between;
+		align-items: baseline;
+		font-variant-caps: small-caps;
+		letter-spacing: 0.02em;
+		border-bottom: 1px solid #d4d0c8;
+		padding-bottom: 0.35rem;
+		margin-bottom: 1.25rem;
+	}
+	.wm-title {
+		font-size: 1.15rem;
+		color: #1a1a1a;
+	}
+	.wm-scope {
+		font-size: 0.85rem;
+		color: #7a7670;
+	}
+
+	/* 2. Leading sky — flat bands, stone silhouettes at the horizon */
+	.sky {
+		position: relative;
+		width: 100vw;
+		margin-left: calc(50% - 50vw);
+		height: 200px;
+		overflow: hidden;
+		border-radius: 0;
+		margin-bottom: 1.5rem;
+	}
+	.band {
+		position: absolute;
+		left: 0;
+		width: 100%;
+	}
+	.band:nth-child(1) { top: 0; height: 26%; }
+	.band:nth-child(2) { top: 26%; height: 22%; }
+	.band:nth-child(3) { top: 48%; height: 20%; }
+	.band:nth-child(4) { top: 68%; height: 14%; }
+	.band:nth-child(5) { top: 82%; height: 10%; }
+	.band:nth-child(6) { top: 92%; height: 8%; }
+	.silhouette {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 110px;
+		display: block;
+	}
+
+	/* 3. Hero sentence */
+	.hero {
+		font-family: var(--font-voice);
+		font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+		line-height: 1.25;
+		margin: 0 0 0.5rem 0;
+		color: #1a1a1a;
+	}
+
+	/* 4. Practical line */
+	.practical {
+		font-size: 0.95rem;
 		color: #5a5550;
 		font-style: italic;
-		margin-top: -0.5rem;
-		margin-bottom: 1.5rem;
+		margin: 0 0 1.5rem 0;
 	}
 
-	.canon-info {
-		font-size: 0.85rem;
-		color: #7a7670;
-		margin-bottom: 1.5rem;
-	}
-
-	.label {
-		color: #5a5550;
-	}
-
-	.site-list {
+	/* 5. Countdown + CTA — small, beside each other, not a hero number */
+	.countdown-row {
 		display: flex;
-		flex-direction: column;
+		align-items: baseline;
 		gap: 1rem;
+		margin-bottom: 2rem;
 	}
-
-	.site-card {
-		display: block;
-		padding: 1rem;
-		border: 1px solid #d4d0c8;
-		border-radius: 4px;
-		text-decoration: none;
-		color: inherit;
-		transition: border-color 0.15s;
-	}
-
-	.site-card:hover {
-		border-color: #8a8578;
-	}
-
-	.card-header {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.card-header h2 {
-		margin: 0;
-		font-size: 1.1rem;
-		font-weight: 600;
-	}
-
-	.region {
-		font-size: 0.85rem;
-		color: #7a7670;
-		margin: 0 0 0.5rem 0;
-	}
-
-	.description {
+	.countdown {
 		font-size: 0.9rem;
-		margin: 0 0 0.5rem 0;
-	}
-
-	.tier-badge {
-		font-size: 0.7rem;
-		padding: 0.1rem 0.4rem;
-		border-radius: 3px;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
-	}
-
-	.badge-surveyed {
-		background: #e8f0e8;
-		color: #3a6a3a;
-		border: 1px solid #b0ccb0;
-	}
-
-	.badge-traditional {
-		background: #f0ece8;
-		color: #8a6a3a;
-		border: 1px solid #d0c4b0;
-	}
-
-	.badge-marquee {
-		font-size: 0.7rem;
-		padding: 0.1rem 0.4rem;
-		border-radius: 3px;
-		background: #e8e4f0;
-		color: #5a4a7a;
-		border: 1px solid #c4bcd0;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
-	}
-
-	.badge-seeding {
-		font-size: 0.7rem;
-		padding: 0.1rem 0.4rem;
-		border-radius: 3px;
-		background: #f0e8d8;
-		color: #7a6a3a;
-		border: 1px solid #d0c4a8;
-		text-transform: uppercase;
-		letter-spacing: 0.03em;
-	}
-
-	.alignments {
-		display: flex;
-		gap: 0.4rem;
-		flex-wrap: wrap;
-	}
-
-	.alignment-tag {
-		font-size: 0.75rem;
-		padding: 0.1rem 0.3rem;
-		background: #eae8e4;
-		border-radius: 3px;
 		color: #5a5550;
+		margin: 0;
+	}
+	.cta {
+		font-size: 0.9rem;
+		color: #3a6a3a;
+		text-decoration: none;
+		border: 1px solid #b0ccb0;
+		padding: 0.35rem 0.8rem;
+		border-radius: 3px;
+		background: #e8f0e8;
+	}
+	.cta:hover {
+		background: #dceadc;
+		color: #2a522a;
+	}
+
+	/* 6. Orientation lines — below the sentence, not above */
+	.orientation {
+		border-top: 1px solid #d4d0c8;
+		padding-top: 0.75rem;
+		margin-bottom: 1.5rem;
+	}
+	.orientation p {
+		font-size: 0.9rem;
+		color: #5a5550;
+		margin: 0.2rem 0;
+	}
+
+	/* 7. Site routing — one line */
+	.routing {
+		font-size: 0.9rem;
+		color: #1a1a1a;
+		margin: 0;
+	}
+	.routing a {
+		color: #3a6a3a;
 	}
 </style>
