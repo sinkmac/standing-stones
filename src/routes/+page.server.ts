@@ -1,6 +1,8 @@
-import { getSite } from '$lib/server/sites';
+import { getSite, sites } from '$lib/server/sites';
 import { calculateNextAlignment } from '$lib/server/alignments';
 import { getSiteVigilStats, getAllVigils } from '$lib/server/vigil';
+import { selectLeader, type StateCandidate, type LastLedMap } from '$lib/server/rotationLogic';
+import { loadRotation, saveRotation } from '$lib/server/rotation';
 
 type LeadSiteId = 'ballochroy' | 'drombeg' | 'callanish';
 
@@ -23,6 +25,12 @@ export interface HomePageData {
 
 // Open-access sites eligible for states 1 and 2, in lead-priority order.
 const OPEN_ACCESS = ['ballochroy', 'drombeg'] as const;
+
+// Full fixed site-list order — canon tie-break for never-led sites.
+const CANON_ORDER = sites.map(s => s.slug);
+
+// Entry-recency window for state 2 eligibility (matches the brief's other windows).
+const STATE2_WINDOW_DAYS = 90;
 
 // Front-door copy — written in the property's voice. Not canon data.
 const SENTENCE: Record<string, string> = {
@@ -108,30 +116,55 @@ async function buildLead(
 
 export async function load(): Promise<HomePageData> {
 	const now = new Date();
+	const loaded = await loadRotation();
+	const vigils = await getAllVigils();
 
-	// State 1 — the nearest open-access alignment within 60 days leads.
-	let nearest: { slug: string; ev: { daysUntil: number; withinWindow: boolean } } | null = null;
-	for (const slug of OPEN_ACCESS) {
-		const ev = nextEvent(slug, now);
-		if (ev && ev.daysUntil <= 60 && (!nearest || ev.daysUntil < nearest.ev.daysUntil)) {
-			nearest = { slug, ev };
+	// Daily decision: reuse today's if already computed, else compute once and
+	// persist (advancing the leader's lastLed and logging the decision). The
+	// rotation is evaluated once per UTC day — stable within a day, fair across
+	// days — rather than once per page request.
+	const today = now.toISOString().slice(0, 10);
+	const stored = loaded.state.decision;
+	let decision: { site: string; state: 1 | 2 | 3; reason: string };
+	let lastLed: LastLedMap = loaded.state.lastLed;
+
+	if (stored && stored.asOf === today) {
+		decision = { site: stored.site, state: stored.state, reason: stored.reason };
+	} else {
+		// State 1 candidates — open-access sites with a solar alignment within 60 days.
+		const state1: StateCandidate[] = [];
+		for (const slug of OPEN_ACCESS) {
+			const ev = nextEvent(slug, now);
+			if (ev && ev.daysUntil <= 60) {
+				state1.push({ slug, daysUntil: ev.daysUntil, withinWindow: ev.withinWindow });
+			}
 		}
-	}
-	if (nearest) {
-		return buildLead(nearest.slug, 1, nearest.ev);
+
+		// State 2 eligibility — open-access sites with any vigil within 90 days.
+		// Entry recency is eligibility only; it no longer ranks.
+		const cutoff = now.getTime() - STATE2_WINDOW_DAYS * DAY;
+		const seenWithinWindow = new Set<string>();
+		for (const v of vigils) {
+			if (now.getTime() - new Date(v.createdAt).getTime() <= cutoff) {
+				seenWithinWindow.add(v.siteSlug);
+			}
+		}
+		const state2Eligible = OPEN_ACCESS.filter(slug => seenWithinWindow.has(slug));
+
+		decision = selectLeader(state1, state2Eligible, lastLed, CANON_ORDER);
+
+		// A rotation-pool site that just took the lead moves to the back of the
+		// queue. State 3 (Callanish fallback) is not a rotation competitor.
+		if (decision.state === 1 || decision.state === 2) {
+			lastLed = { ...lastLed, [decision.site]: now.toISOString() };
+		}
+		await saveRotation(decision, today, lastLed);
 	}
 
-	// State 2 — the most recent vigil at an open-access site within 90 days leads.
-	const all = await getAllVigils();
-	const recent = all.find(
-		(v) =>
-			(OPEN_ACCESS as readonly string[]).includes(v.siteSlug) &&
-			Date.now() - new Date(v.createdAt).getTime() <= 90 * DAY
-	);
-	if (recent) {
-		return buildLead(recent.siteSlug, 2, nextEvent(recent.siteSlug, now) ?? { daysUntil: null, withinWindow: false });
+	if (decision.state === 3) {
+		return buildLead('callanish', 3, { daysUntil: null, withinWindow: false });
 	}
 
-	// State 3 — Callanish fallback. No countdown.
-	return buildLead('callanish', 3, { daysUntil: null, withinWindow: false });
+	const ev = nextEvent(decision.site, now) ?? { daysUntil: null, withinWindow: false };
+	return buildLead(decision.site as LeadSiteId, decision.state as 1 | 2, ev);
 }
