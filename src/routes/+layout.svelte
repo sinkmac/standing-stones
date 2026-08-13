@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	let { children } = $props();
 </script>
 
@@ -6,12 +7,14 @@
 	<meta name="description" content="Countdown and witness tool for solar and lunar alignments at standing stones and stone circles." />
 </svelte:head>
 
-<header>
-	<a href="/" class="site-title">Standing Stones & Alignments</a>
-	<nav>
-		<a href="/">Sites</a>
-	</nav>
-</header>
+{#if page.url.pathname !== '/'}
+	<header>
+		<a href="/" class="site-title">Standing Stones & Alignments</a>
+		<nav>
+			<a href="/">Sites</a>
+		</nav>
+	</header>
+{/if}
 
 <main>
 	{@render children()}
@@ -19,7 +22,7 @@
 
 <footer>
 	<p>Not a heritage directory. A countdown and witness tool for the sky.</p>
-	<p>Non-events are valid entries. The register is the moat.</p>
+	<p>Non-events are valid entries. Going and seeing nothing still counts.</p>
 </footer>
 
 <style>

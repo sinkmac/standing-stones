@@ -15,6 +15,26 @@
 					.join(';')
 			: ''
 	);
+
+	// Callanish-only sparse star field — a few pale points confined to the
+	// upper third of the sky, so a deliberately dark sky reads as night
+	// rather than a failed image. Hard cap: under 15 points, upper third
+	// only. Never rendered for other sites — the fix is scoped to Callanish.
+	const CALLANISH_STARS = [
+		{ left: 8, top: 6, size: 1.5, opacity: 0.7 },
+		{ left: 17, top: 20, size: 1, opacity: 0.5 },
+		{ left: 26, top: 10, size: 1, opacity: 0.6 },
+		{ left: 34, top: 24, size: 1.5, opacity: 0.8 },
+		{ left: 41, top: 5, size: 1, opacity: 0.55 },
+		{ left: 49, top: 16, size: 1, opacity: 0.7 },
+		{ left: 57, top: 27, size: 1.5, opacity: 0.65 },
+		{ left: 63, top: 9, size: 1, opacity: 0.5 },
+		{ left: 70, top: 21, size: 1, opacity: 0.75 },
+		{ left: 78, top: 6, size: 1.5, opacity: 0.6 },
+		{ left: 85, top: 18, size: 1, opacity: 0.5 },
+		{ left: 92, top: 26, size: 1, opacity: 0.7 }
+	];
+	let skyStars = $derived(site.id === 'callanish' ? CALLANISH_STARS : []);
 </script>
 
 <svelte:head>
@@ -26,10 +46,10 @@
 </svelte:head>
 
 <div class="landing" style="--font-voice: Georgia, 'Times New Roman', Times, serif">
-	<div class="wordmark">
-		<span class="wm-title">standing stones</span>
+	<header class="wordmark">
+		<a href="/" class="wm-title">standing stones</a>
 		<span class="wm-scope" aria-label="scope">seven sites · vigil register</span>
-	</div>
+	</header>
 
 	{#if site.showSky}
 		<div class="sky" style={skyStyle} role="img" aria-label="Illustrated banded sky over {site.id} at its alignment">
@@ -54,6 +74,13 @@
 					fill="#0a0d12"
 				/>
 			</svg>
+			{#if skyStars.length}
+				<div class="stars" aria-hidden="true">
+					{#each skyStars as s}
+						<span class="star" style="left:{s.left}%; top:{s.top}%; width:{s.size}px; height:{s.size}px; opacity:{s.opacity}"></span>
+					{/each}
+				</div>
+			{/if}
 		</div>
 	{/if}
 
@@ -76,7 +103,7 @@
 			<p>Timing given in ranges. These are broad events, not instants.</p>
 		</div>
 
-		<p class="routing">Seven sites keep a <a href="/register">register</a>.</p>
+		<p class="routing">Seven sites keep a <a href="/register">register</a>. Browse the <a href="/register">sites</a>.</p>
 	</main>
 </div>
 
@@ -133,6 +160,19 @@
 		width: 100%;
 		height: 110px;
 		display: block;
+	}
+	.stars {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 33%;
+		overflow: hidden;
+	}
+	.star {
+		position: absolute;
+		background: #cdd2db;
+		border-radius: 50%;
 	}
 
 	/* 3. Hero sentence */

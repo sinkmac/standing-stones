@@ -38,7 +38,7 @@ const SENTENCE: Record<string, string> = {
 		'On about six evenings in June, the sun goes down into the notch between the Paps of Jura, seen from a slab at Ballochroy.',
 	drombeg:
 		'Around the winter solstice, the setting sun aligns with the recumbent stone at Drombeg and lights the back of the circle.',
-	callanish: 'Callanish stands on Lewis in the Outer Hebrides, Bortle 2, open every hour of the night.'
+	callanish: 'Callanish stands on Lewis in the Outer Hebrides, among the darkest skies in Britain, open every hour of the night.'
 };
 
 const PRACTICAL_LINE: Record<string, string> = {
