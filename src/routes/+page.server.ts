@@ -44,7 +44,8 @@ const SENTENCE: Record<string, string> = {
 const PRACTICAL_LINE: Record<string, string> = {
 	ballochroy: 'Often it is raining.',
 	drombeg: 'The circle is small. The sky around it is wide.',
-	callanish: 'No alignment is due. It is open every hour.'
+	callanish:
+		'No fixed alignment is tracked here — the sky itself is the constant. There is no wrong time to come.'
 };
 
 // Banded-sky palettes, top band first. Written to CSS custom properties in the
