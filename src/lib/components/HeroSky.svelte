@@ -155,14 +155,16 @@
 		position: absolute;
 		left: 0;
 		right: 0;
-		bottom: -6vh;
-		height: 40%;
-		background: radial-gradient(ellipse at 50% 100%, rgba(190, 205, 235, 0.12), transparent 70%);
-		filter: blur(3px);
+		bottom: 0;
+		height: 100%;
+		background:
+			radial-gradient(ellipse 60% 40% at 50% 100%, rgba(190, 205, 235, 0.45), transparent 75%);
+		filter: blur(6px);
+		z-index: 0;
 	}
 	.star.bright {
-		opacity: 0.85;
-		box-shadow: 0 0 3px 1px rgba(205, 210, 219, 0.35);
+		opacity: 1;
+		box-shadow: 0 0 5px 2px rgba(215, 222, 235, 0.6);
 	}
 	@keyframes twinkle {
 		from { opacity: 0.35; }
