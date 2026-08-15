@@ -8,6 +8,12 @@
 
 	let { bands = [], siteId = 'callanish' }: { bands: string[]; siteId?: string } = $props();
 
+	// Moonlit variant: Callanish has no solar event, so its sky reads as
+	// intentional stillness — cooler gradient, denser stars, a diffuse cold
+	// glow near the horizon. The alignment arc is withheld (its copy says no
+	// fixed alignment is tracked here). Derived from siteId so it stays honest.
+	let isMoonlit = $derived(siteId === 'callanish');
+
 	let skyStyle = $derived(
 		bands.length
 			? [1, 2, 3, 4, 5, 6]
@@ -18,23 +24,28 @@
 
 	// Sparse, deterministic star field — seeded off the site id so it's stable
 	// per site (no layout shift between renders), not random per page view.
+	// The moonlit variant gets more, brighter points — Callanish's copy leads
+	// with "the darkest skies in Britain", so the stars carry the depth.
 	let seed = $derived(
 		[...siteId].reduce((acc, ch) => acc + ch.charCodeAt(0), 0)
 	);
+	let starCount = $derived(isMoonlit ? 34 : 18);
 	let stars = $derived(
-		Array.from({ length: 18 }, (_, i) => {
+		Array.from({ length: starCount }, (_, i) => {
 			const n = (seed + i * 37) % 271;
 			return {
 				left: (n % 100),
 				top: ((n * 7) % 46), // upper half of the sky only
 				delay: (n % 90) / 10,
-				size: n % 3 === 0 ? 2 : 1.4
+				size: n % 3 === 0 ? (isMoonlit ? 2.4 : 2) : isMoonlit ? 1.8 : 1.4,
+				// Moonlit stars are brighter (higher base opacity).
+				bright: n % 5 === 0
 			};
 		})
 	);
 </script>
 
-<div class="heroshell" class:no-bands={!bands.length} aria-hidden="true">
+<div class="heroshell" class:no-bands={!bands.length} class:moonlit={isMoonlit} aria-hidden="true">
 	{#if bands.length}
 		<div class="sky" style={skyStyle}>
 			<div class="band" style="background: var(--sky-band-1)"></div>
@@ -44,10 +55,15 @@
 			<div class="band" style="background: var(--sky-band-5)"></div>
 			<div class="band" style="background: var(--sky-band-6)"></div>
 
+			{#if isMoonlit}
+				<div class="moonlight" aria-hidden="true"></div>
+			{/if}
+
 			<div class="stars">
 				{#each stars as s}
 					<span
 						class="star"
+						class:bright={s.bright}
 						style="left:{s.left}%; top:{s.top}%; width:{s.size}px; height:{s.size}px; --d:{s.delay}s"
 					></span>
 				{/each}
@@ -71,19 +87,23 @@
 		/>
 	</svg>
 
-	<!-- Dashed alignment arc: from upper sky down to the gap between stones -->
-	<svg class="arc" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
-		<path
-			d="M600 20 C 560 90, 560 140, 505 160"
-			fill="none"
-			stroke="var(--arc, #cfd6e8)"
-			stroke-width="2"
-			stroke-dasharray="8 8"
-			stroke-linecap="round"
-			opacity="0.8"
-		/>
-		<circle cx="505" cy="160" r="4" fill="none" stroke="var(--arc, #cfd6e8)" stroke-width="2" opacity="0.9" />
-	</svg>
+	<!-- Dashed alignment arc: from upper sky down to the gap between stones.
+	     Withheld on the moonlit (Callanish) variant — no fixed alignment is
+	     tracked there, so an arc pointing at a target would be dishonest. -->
+	{#if !isMoonlit}
+		<svg class="arc" viewBox="0 0 1200 200" preserveAspectRatio="none" aria-hidden="true">
+			<path
+				d="M600 20 C 560 90, 560 140, 505 160"
+				fill="none"
+				stroke="var(--arc, #cfd6e8)"
+				stroke-width="2"
+				stroke-dasharray="8 8"
+				stroke-linecap="round"
+				opacity="0.8"
+			/>
+			<circle cx="505" cy="160" r="4" fill="none" stroke="var(--arc, #cfd6e8)" stroke-width="2" opacity="0.9" />
+		</svg>
+	{/if}
 </div>
 
 <style>
@@ -128,6 +148,21 @@
 		opacity: 0.55;
 		animation: twinkle 4s ease-in-out infinite alternate;
 		animation-delay: var(--d, 0s);
+	}
+	/* Moonlit (Callanish) variant: a diffuse cold glow near the horizon and
+	   brighter stars — reads as dark-and-still, not empty. No warm light. */
+	.moonlight {
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -6vh;
+		height: 40%;
+		background: radial-gradient(ellipse at 50% 100%, rgba(190, 205, 235, 0.12), transparent 70%);
+		filter: blur(3px);
+	}
+	.star.bright {
+		opacity: 0.85;
+		box-shadow: 0 0 3px 1px rgba(205, 210, 219, 0.35);
 	}
 	@keyframes twinkle {
 		from { opacity: 0.35; }
