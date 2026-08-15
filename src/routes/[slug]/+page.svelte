@@ -1,4 +1,6 @@
 <script lang="ts">
+	import HeroSky from '$lib/components/HeroSky.svelte';
+
 	let { data } = $props();
 
 	let site = $derived(data.site);
@@ -6,6 +8,7 @@
 	let vigilStats = $derived(data.vigilStats);
 	let recentVigils = $derived(data.recentVigils);
 	let skySummary = $derived(data.skySummary);
+	let skyBands = $derived(data.skyBands ?? []);
 
 	// Form state
 	let observation = $state('');
@@ -138,6 +141,8 @@
 <svelte:head>
 	<title>{site.name} — Standing Stones & Alignments</title>
 </svelte:head>
+
+	<HeroSky bands={skyBands} siteId={site.slug} />
 
 	<a href="/" class="back-link">← All sites</a>
 

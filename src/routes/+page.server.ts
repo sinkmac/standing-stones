@@ -1,6 +1,7 @@
 import { getSite, sites } from '$lib/server/sites';
 import { calculateNextAlignment } from '$lib/server/alignments';
 import { getSiteVigilStats, getAllVigils } from '$lib/server/vigil';
+import { SKY_BANDS } from '$lib/skyPalette';
 import { selectLeader, type StateCandidate, type LastLedMap } from '$lib/server/rotationLogic';
 import { loadRotation, saveRotation } from '$lib/server/rotation';
 
@@ -46,14 +47,6 @@ const PRACTICAL_LINE: Record<string, string> = {
 	drombeg: 'The circle is small. The sky around it is wide.',
 	callanish:
 		'No fixed alignment is tracked here — the sky itself is the constant. There is no wrong time to come.'
-};
-
-// Banded-sky palettes, top band first. Written to CSS custom properties in the
-// component (--sky-band-1 .. --sky-band-6), never hardcoded in markup.
-const SKY_BANDS: Record<string, string[]> = {
-	ballochroy: ['#0a0d12', '#141a25', '#2a2f3d', '#6d524d', '#8a6250', '#a5764f'],
-	drombeg: ['#0b0e14', '#18202b', '#2b333e', '#4d5058', '#666069', '#b9ac96'],
-	callanish: ['#080a0f', '#0d1119', '#111720', '#151b23', '#1a2028', '#1f252e']
 };
 
 const DAY = 86_400_000;

@@ -3,6 +3,7 @@ import { getSite } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
 import { getVigilsForSite, getSiteVigilStats, type VigilEntry } from '$lib/server/vigil';
 import { calculateAncestralSky, type AncestralSkyResult } from '$lib/server/ancestral';
+import { SKY_BANDS } from '$lib/skyPalette';
 
 export interface SitePageData {
 	site: NonNullable<ReturnType<typeof getSite>>;
@@ -19,6 +20,7 @@ export interface SitePageData {
 	recentVigils: VigilEntry[];
 	skySummary: { sunrise: string; sunset: string; sunlight: string };
 	ancestralSky: AncestralSkyResult | null;
+	skyBands: string[];
 }
 
 export async function load({ params }): Promise<SitePageData> {
@@ -65,6 +67,7 @@ export async function load({ params }): Promise<SitePageData> {
 		vigilStats,
 		recentVigils: recentVigils.slice(0, 10),
 		skySummary,
-		ancestralSky
+		ancestralSky,
+		skyBands: SKY_BANDS[site.slug] ?? []
 	};
 }
