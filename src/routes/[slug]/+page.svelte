@@ -208,7 +208,11 @@
 		{:else}
 			{#each nextEvents as event}
 				<div class="event-card">
-					<p class="event-badge">{event.eventTime} · {event.daysBefore}/{event.daysAfter} days window</p>
+					{#if (event.daysBefore + event.daysAfter) === 0}
+						<p class="event-badge">{event.eventTime} · one night only</p>
+					{:else}
+						<p class="event-badge">{event.eventTime} · {event.daysBefore}/{event.daysAfter} days window</p>
+					{/if}
 					<p class="event-date">{event.dateRange}</p>
 					<p class="event-desc">{event.windowDescription}</p>
 				</div>
