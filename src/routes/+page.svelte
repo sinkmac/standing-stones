@@ -3,6 +3,7 @@
 
 	let site = $derived(data.site);
 	let state = $derived(data.state);
+	let isState3 = $derived(state === 3);
 
 	// Practical line: the seen/kept ratio once 3+ vigils are recorded,
 	// otherwise the site's practical copy. The ratio threshold is a design fact.
@@ -16,10 +17,7 @@
 			: ''
 	);
 
-	// Callanish-only sparse star field — a few pale points confined to the
-	// upper third of the sky, so a deliberately dark sky reads as night
-	// rather than a failed image. Hard cap: under 15 points, upper third
-	// only. Never rendered for other sites — the fix is scoped to Callanish.
+	
 	const CALLANISH_STARS = [
 		{ left: 8, top: 6, size: 1.5, opacity: 0.7 },
 		{ left: 17, top: 20, size: 1, opacity: 0.5 },
@@ -48,7 +46,7 @@
 <div class="landing" style="--font-voice: Georgia, 'Times New Roman', Times, serif">
 	<header class="wordmark">
 		<a href="/" class="wm-title">standing stones</a>
-		<span class="wm-scope" aria-label="scope">seven sites · vigil register</span>
+		<span class="wm-scope" aria-label="scope">Seven sites · Britain &amp; Ireland · Vigil register</span>
 	</header>
 
 	{#if site.showSky}
@@ -98,10 +96,15 @@
 		</div>
 
 		<div class="orientation">
-			<p>Countdowns to the next alignment at seven ancient sites.</p>
-			<p>A register of every vigil kept, including the ones that saw nothing.</p>
-			<p>Timing given in ranges. These are broad events, not instants.</p>
-		</div>
+				{#if !isState3}
+					<p>Countdowns to the next alignment at seven ancient sites.</p>
+				{:else}
+					<p>Next alignments and the sites that count them down.</p>
+				{/if}
+				<p>A register of every vigil kept, including the ones that saw nothing.</p>
+				<p>Timing given in ranges. These are broad events, not instants.</p>
+				<p>Come and watch one arrive — the sky still keeps the appointments these stones were set for.</p>
+			</div>
 
 		<p class="routing">Seven sites keep a <a href="/register">register</a>. Browse the <a href="/register">sites</a>.</p>
 	</main>

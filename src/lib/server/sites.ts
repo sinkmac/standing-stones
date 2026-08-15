@@ -34,7 +34,7 @@ export interface AccessInfo {
 
 export interface EnrichmentContent {
 	/** Curated dark-sky sentence for this site. Leads with closure on managed-access sites. */
-	darkSky: string;
+	darkSky?: string;
 	/** How to get from where you leave the car to where you stand. Nullable — prose only, never coordinates. */
 	approach: string;
 }
@@ -86,7 +86,7 @@ export const sites: Site[] = [
 		marquee: false,
 		registerSeeding: true,
 		enrichment: {
-			approach: 'Park at the A83 bridge, or the beach layby just south. The farm track is unsignposted — the landmark is a barn with a red roof. Ten to twenty minutes on foot depending on where you get parked, uphill on rough track. The stones aren\'t visible from the road until you\'re nearly on them. Working farm: gates closed, dogs on leads.',
+			approach: 'Park at the A83 bridge, or the beach layby just south. The farm track is unsignposted — the landmark is a barn with a red roof. Ten to twenty minutes on foot depending on where you get parked, uphill on rough track. The stones aren\'t visible from the road until you\'re nearly on them. Working farm: gates closed, dogs on leads. Note no visitor centre and no gate — a field, three stones, and Cora Bheinn on Jura on the horizon. Most nights you\'ll have it to yourself.',
 			darkSky: 'Very little artificial light on this stretch of the Kintyre coast, and the sea horizon west towards Jura is unlit. No formal dark-sky designation here — just a quiet road and a long way to the nearest town.'
 		},
 		alignments: [
@@ -119,7 +119,7 @@ export const sites: Site[] = [
 		marquee: false,
 		registerSeeding: true,
 		enrichment: {
-			approach: 'Small car park at the end of the lane, room for about ten cars. Two to five minutes on a maintained path with a slight rise. Exposed, and often wet underfoot.',
+			approach: 'Small car park at the end of the lane, room for about ten cars. Two to five minutes on a maintained path with a slight rise. Exposed, and often wet underfoot. A lay-by, a short path, then the circle — no ticket, no queue. Often the only footsteps are your own.',
 			darkSky: 'Rural West Cork with the Atlantic to the south. Glandore and Rosscarbery put a little light into the eastern sky; the seaward side stays dark.'
 		},
 		alignments: [
@@ -301,6 +301,9 @@ export const sites: Site[] = [
 		description: 'Three Early Bronze Age passage-graves near Inverness, oriented to midwinter sunset. The passages align so the setting solstice sun shines directly into the chambers. Surveyed independently by Somerville (1910), MacKie (1975), and Bradley (2000).',
 		marquee: false,
 		registerSeeding: true,
+		enrichment: {
+			approach: 'Free to enter, open access with no booking required, down a quiet lane outside Inverness. Even in daylight it\'s rarely busy.',
+		},
 		alignments: [
 			{
 				type: 'winter-solstice',
