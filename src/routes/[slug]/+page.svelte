@@ -170,21 +170,20 @@
 		{/if}
 	</div>
 
-	<!-- THE APPROACH -->
-	{#if site.enrichment?.approach}
-		<div class="enrichment-approach">
-			<h3>The approach</h3>
-			<p>{site.enrichment.approach}</p>
-		</div>
-	{/if}
-
-	<!-- DARK SKY -->
-	{#if site.enrichment?.darkSky}
-		<div class="enrichment-dark-sky">
-			<h3>Dark sky</h3>
-			<p>{site.enrichment.darkSky}</p>
-		</div>
-	{/if}
+	<!-- BEFORE YOU GO -->
+	<div class="before-you-go">
+		<h3>Before you go</h3>
+		{#if site.enrichment?.approach}
+			<div class="enrichment-approach">
+				<p>{site.enrichment.approach}</p>
+			</div>
+		{/if}
+		{#if site.enrichment?.darkSky}
+			<div class="enrichment-dark-sky">
+				<p>{site.enrichment.darkSky}</p>
+			</div>
+		{/if}
+	</div>
 
 	<!-- COUNTDOWN SECTION -->
 	<section class="countdown countdown-hidden">
@@ -655,6 +654,15 @@
 		margin: 0.25rem 0 0 0;
 	}
 
+	.before-you-go {
+		margin-bottom: 1.5rem;
+	}
+
+	.before-you-go h3 {
+		font-size: 1.1rem;
+		margin: 0 0 0.5rem 0;
+	}
+
 	.enrichment-approach {
 		font-size: 0.85rem;
 		color: #5a5550;
@@ -662,12 +670,6 @@
 		padding: 0.75rem;
 		background: #f4f2ee;
 		border-radius: 4px;
-	}
-
-	.enrichment-approach h3 {
-		margin: 0 0 0.25rem 0;
-		font-size: 0.9rem;
-		color: #3a3a3a;
 	}
 
 	.enrichment-approach p {
@@ -687,12 +689,6 @@
 		overflow: hidden;
 	}
 
-	.enrichment-dark-sky h3 {
-		margin: 0 0 0.25rem 0;
-		font-size: 0.9rem;
-		color: #3a3a3a;
-	}
-
 	.enrichment-dark-sky p {
 		margin: 0;
 	}
@@ -701,10 +697,6 @@
 		background: #0d1117;
 		border-color: #2a3040;
 		border-left-color: #3a4a60;
-	}
-
-	:global(.enrichment-dark-sky.sky-dark) h3 {
-		color: #dce8f0;
 	}
 
 	:global(.enrichment-dark-sky.sky-dark) p {
