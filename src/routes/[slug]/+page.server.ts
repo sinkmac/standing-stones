@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { getSite } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
+import { calculateNextLunarLunistice } from '$lib/server/lunarLunistice';
 import { getVigilsForSite, getSiteVigilStats, type VigilEntry } from '$lib/server/vigil';
 import { calculateAncestralSky, type AncestralSkyResult } from '$lib/server/ancestral';
 import { SKY_BANDS } from '$lib/skyPalette';
@@ -15,6 +16,11 @@ export interface SitePageData {
 		daysAfter: number;
 		windowDescription: string;
 		isPrecise: boolean;
+		/** Present only on events produced from the lunar-lunistice solver. */
+		alignmentType?: 'lunar-lunistice-south' | 'lunar-standstill';
+		moonDeclinationDeg?: number;
+		moonriseAzimuthDeg?: number;
+		moonPhase?: string;
 	}>;
 	vigilStats: Awaited<ReturnType<typeof getSiteVigilStats>>;
 	recentVigils: VigilEntry[];
@@ -31,11 +37,32 @@ export async function load({ params }): Promise<SitePageData> {
 
 	const now = new Date();
 
-	// Calculate next events for solar alignments (skip lunar standstill for now)
+	// Calculate next events. Solar alignments use the solar solver; the monthly
+	// southern lunistice (Callanish) uses the lunar solver, mirroring the API route.
 	const nextEvents = site.alignments
 		.map(a => {
 			if (a.type === 'lunar-standstill') {
 				return null;
+			}
+			if (a.type === 'lunar-lunistice-south') {
+				const lev = calculateNextLunarLunistice(now, site.latitude);
+				return lev ? {
+					solsticeDate: lev.datetime,
+					dateRange: lev.datetime.toLocaleDateString('en-GB', {
+						weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+					}),
+					eventTime: lev.datetime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+					daysBefore: 0,
+					daysAfter: 0,
+					windowDescription: `Monthly southern lunistice — the moon reaches declination ${lev.declinationDeg.toFixed(1)}° ` +
+						`and rises at ${Math.round(lev.riseAzimuthDeg)}° from north, skimming the Sleeping Beauty ridge. ` +
+						`Moon phase: ${lev.phaseBand}.`,
+					isPrecise: site.tier === 'surveyed',
+					alignmentType: 'lunar-lunistice-south' as const,
+					moonDeclinationDeg: lev.declinationDeg,
+					moonriseAzimuthDeg: lev.riseAzimuthDeg,
+					moonPhase: lev.phaseBand
+				} : null;
 			}
 			return calculateNextAlignment(
 				site.latitude,
