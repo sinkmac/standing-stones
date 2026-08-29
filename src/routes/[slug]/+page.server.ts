@@ -16,8 +16,8 @@ export interface SitePageData {
 		daysAfter: number;
 		windowDescription: string;
 		isPrecise: boolean;
-		/** Present only on events produced from the lunar-lunistice solver. */
-		alignmentType?: 'lunar-lunistice-south' | 'lunar-standstill';
+		/** Present when the producing solver knows the alignment type. */
+		alignmentType?: string;
 		moonDeclinationDeg?: number;
 		moonriseAzimuthDeg?: number;
 		moonPhase?: string;
@@ -64,7 +64,7 @@ export async function load({ params }): Promise<SitePageData> {
 					moonPhase: lev.phaseBand
 				} : null;
 			}
-			return calculateNextAlignment(
+			const solar = calculateNextAlignment(
 				site.latitude,
 				site.longitude,
 				a.bearing,
@@ -73,6 +73,7 @@ export async function load({ params }): Promise<SitePageData> {
 				site.tier,
 				now
 			);
+			return solar ? { ...solar, alignmentType: a.type } : null;
 		})
 		.filter((e): e is NonNullable<typeof e> => e !== null);
 

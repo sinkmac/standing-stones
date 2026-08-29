@@ -1,24 +1,20 @@
 <script lang="ts">
-	// Callanish field instrument — the tiled Callanish page.
+	// Field instrument — the tiled dark page, slug-driven and reusable.
 	//
-	// Reproduces the layout *logic* of the approved mockup, not its fictional data
-	// density. This build renders ONLY what the current canon/data model genuinely
-	// supports. Nothing is shown merely because it would make the instrument look
-	// fuller: no live weather, no sunrise/sunset, no facilities/mobile status, no
-	// invented events, no seeded testimonials, no placeholder rows.
+	// Generalized from the Callanish field instrument. Rendered entirely from
+	// each site's existing canon/data:
+	//   - Palette: the site's own SKY_BANDS entry (via HeroSky); tile strata are
+	//     one shared dark system across sites.
+	//   - Hero arc: HeroSky shows it for solar sites, withholds it for Callanish
+	//     (the moonlit-no-arc rule lives in HeroSky, keyed on siteId).
+	//   - Next vigils: whatever nextEvents the page load actually returns —
+	//     solar solstice countdowns, Stonehenge's two events, Callanish's
+	//     monthly lunistice. Same data, rendered per shape. No invented events.
+	//   - Thinner canon = thinner tiles. Nothing padded, nothing invented.
 	//
-	// Tiles (all drawn from real data):
-	//   HERO      – existing Callanish hero imagery + approved copy + primary
-	//               entry into the full guide.
-	//   BEFORE    – existing "Before you go" enrichment (approach) + access.
-	//   DARK SKY  – existing dark-sky enrichment. The instrument that answers
-	//               "is this a good night for a vigil?"
-	//   NEXT      – the dated monthly southern lunistice from the lunar solver
-	//               (wired into the page load; mirrors the API route). One
-	//               defensible dated event → one row. No invented density.
-	//   BOOK      – existing vigil register (stats + recent + keep-the-vigil form).
-	//   HISTORY   – existing canon description + alignment source, concise.
-	//   LOCATION  – existing canon coordinates only (no new map infrastructure).
+	// Countdown badge forms (both dark-styled, brass accent, monospace):
+	//   single night  — "19:59 · one night only"
+	//   window        — "21:08 · 4/6 days window"
 
 	import HeroSky from './HeroSky.svelte';
 
@@ -75,15 +71,51 @@
 		}
 	}
 
-	// Location from canon (no map prop introduced). Longitude negative → W.
+	// Location from canon (no map prop). Longitude negative → W.
 	let coordLine = $derived(
 		`${Math.abs(site.latitude).toFixed(4)}°${site.latitude < 0 ? 'S' : 'N'} ` +
 		`${Math.abs(site.longitude).toFixed(4)}°${site.longitude < 0 ? 'W' : 'E'}`
 	);
 
-	// The one dated lunistice is Callanish's defensible next event.
-	let nextLunistice = $derived(
-		nextEvents.find((e) => e.alignmentType === 'lunar-lunistice-south') ?? null
+	// Human label for an event's alignment type — canon words, no invention.
+	function eventLabel(type?: string): string {
+		switch (type) {
+			case 'summer-solstice': return 'Summer solstice';
+			case 'winter-solstice': return 'Winter solstice';
+			case 'equinox': return 'Equinox';
+			case 'lunar-lunistice-south': return 'Monthly southern lunistice';
+			case 'lunar-standstill': return 'Lunar standstill';
+			default: return 'Next alignment';
+		}
+	}
+
+	// Badge: single-night form vs multi-day-window form.
+	function badge(e: (typeof nextEvents)[number]): string {
+		const win = e.daysBefore + e.daysAfter;
+		return win === 0
+			? `${e.eventTime} · one night only`
+			: `${e.eventTime} · ${e.daysBefore}/${e.daysAfter} days window`;
+	}
+
+	// Empty-register copy: the originally-shipped strings are per-site literals
+	// (Callanish's live page must not reword). The interpolation fallback is
+	// only for sites that never displayed this copy before.
+	const EMPTY_BOOK: Record<string, string[]> = {
+		callanish: [
+			'The Callanish register is quiet — no one has recorded a vigil yet.',
+			'That absence is information too. Yours would be an honest first line.'
+		]
+	};
+	const emptyBook = $derived(
+		EMPTY_BOOK[site.slug] ?? [
+			`The ${site.name} register is quiet — no one has recorded a vigil yet.`,
+			'That absence is information too. Yours would be an honest first line.'
+		]
+	);
+	const emptyNext = $derived(
+		site.slug === 'callanish'
+			? 'No dated upcoming vigil for Callanish is currently available.'
+			: `No dated upcoming vigil for ${site.name} is currently available.`
 	);
 </script>
 
@@ -137,21 +169,18 @@
 	<!-- TILE 4 : NEXT VIGILS -->
 	<section class="tile tile-next">
 		<h2>Next vigils</h2>
-		{#if nextLunistice}
-			<div class="event-card">
-				<p class="event-type">Monthly southern lunistice</p>
-				<p class="event-date">{nextLunistice.dateRange}</p>
-				<p class="event-badge">{nextLunistice.eventTime} · one night only</p>
-				<p class="event-desc">
-					The moon reaches its most southerly extent — declination
-					{nextLunistice.moonDeclinationDeg?.toFixed(1)}° — and rises at
-					{Math.round(nextLunistice.moonriseAzimuthDeg ?? 0)}° from north,
-					skimming the Sleeping Beauty ridge. Moon phase: {nextLunistice.moonPhase}.
-				</p>
-			</div>
+		{#if nextEvents.length > 0}
+			{#each nextEvents as event}
+				<div class="event-card">
+					<p class="event-type">{eventLabel(event.alignmentType)}</p>
+					<p class="event-date">{event.dateRange}</p>
+					<p class="event-badge">{badge(event)}</p>
+					<p class="event-desc">{event.windowDescription}</p>
+				</div>
+			{/each}
 		{:else}
 			<div class="empty-instrument">
-				<p>No dated upcoming vigil for Callanish is currently available.</p>
+				<p>{emptyNext}</p>
 				<p>The absence of a datable alignment is not the absence of a sky. Keep the vigil and the register will show it.</p>
 			</div>
 		{/if}
@@ -183,8 +212,8 @@
 			</div>
 		{:else}
 			<div class="empty-book">
-				<p>The Callanish register is quiet — no one has recorded a vigil yet.</p>
-				<p>That absence is information too. Yours would be an honest first line.</p>
+				<p>{emptyBook[0]}</p>
+				<p>{emptyBook[1]}</p>
 			</div>
 		{/if}
 
@@ -265,10 +294,9 @@
 	   A 12-column instrument cannot live in that: break out to near-full
 	   viewport width (same full-bleed technique HeroSky uses), capped and
 	   centred so wide screens don't sprawl. */
-	/* Dark visual identity — derived from Callanish's own moonlit SKY_BANDS
-	   (#04060e→#162035, skyPalette.ts): the page ground is the night, tiles are
-	   lighter strata of the same sky. Muted per-tile accents keep the existing
-	   per-site palette logic (moonlit silver-blue family), no new system. */
+	/* Dark visual identity — one shared tile system across sites; each site's
+	   sky comes from its own SKY_BANDS entry via HeroSky, while the tile
+	   strata stay constant so the identity reads as one product. */
 	.field {
 		/* full-bleed breakout from the 54ch prose measure, capped at 1200px.
 		   width = min(100vw, cap); margin-left = 50% - half-the-actual-width,
@@ -305,7 +333,7 @@
 	.readout { font-size: 0.85rem; color: #b9c2d4; }
 	.tile p, .readout p { line-height: 1.45; }
 
-	/* HERO — dominates; illustrated moonlit sky, copy in normal flow below. */
+	/* HERO — dominates; illustrated per-site sky, copy in normal flow below. */
 	.hero {
 		grid-area: hero;
 		background: none;
@@ -335,13 +363,15 @@
 	.guide-entry a { color: #9db4d8; font-weight: 600; text-decoration: none; }
 	.guide-entry a:hover { text-decoration: underline; color: #c4d4ee; }
 
-	/* NEXT — the dated lunistice, clearly visible. */
+	/* NEXT — the dated countdown(s), clearly visible. Brass/warm accent —
+	   the "when" instrument. Badge handles both single-night and window forms. */
 	.tile-next { grid-area: next; background: #131b2e; border-left: 3px solid #8a7d4a; }
 	.event-type { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.09em; color: #b0a36a; }
 	.event-date { font-weight: 600; font-size: 1.02rem; color: #eef1f8; }
-	.event-badge { font-size: 0.85rem; color: #8fbf8f; font-family: monospace; }
+	.event-badge { font-size: 0.85rem; color: #d9c27a; font-family: monospace; }
 	.event-desc { font-size: 0.85rem; color: #b9c2d4; }
-	.event-card { display: flex; flex-direction: column; gap: 0.25rem; }
+	.event-card { display: flex; flex-direction: column; gap: 0.25rem; padding: 0.4rem 0; }
+	.event-card + .event-card { border-top: 1px solid #1d2740; }
 
 	/* DARK SKY — the instrument answering "is this a good night?".
 	   Honest treatment: striking text on deep ground, no gauge/dial, no
@@ -405,8 +435,8 @@
 	.back-link:hover { color: #dbe1ee; }
 
 	/* Page ground: the night extends beyond the tiles — body, header, footer.
-	   Scoped via :has(.field) so ONLY this component's pages go dark; the CSS
-	   ships with this component, so no other route is affected. */
+	   Scoped via :has(.field) so ONLY component pages go dark; the CSS ships
+	   with this component, so no other route is affected. */
 	:global(html:has(.field)) { overflow-x: clip; }
 	:global(body:has(.field)) { background: #04060e; }
 	:global(body:has(.field) header) { border-bottom-color: #1d2740; }

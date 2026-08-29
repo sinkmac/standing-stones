@@ -1,6 +1,6 @@
 <script lang="ts">
 	import HeroSky from '$lib/components/HeroSky.svelte';
-	import CallanishFieldInstrument from '$lib/components/CallanishFieldInstrument.svelte';
+	import FieldInstrument from '$lib/components/FieldInstrument.svelte';
 
 	let { data } = $props();
 
@@ -143,8 +143,8 @@
 	<title>{site.name} — Standing Stones & Alignments</title>
 </svelte:head>
 
-{#if site.slug === 'callanish'}
-	<CallanishFieldInstrument {data} />
+{#if site.slug === 'callanish' || site.slug === 'ballochroy'}
+	<FieldInstrument {data} />
 {:else}
 
 	<HeroSky bands={skyBands} siteId={site.slug} />
