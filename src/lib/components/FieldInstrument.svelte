@@ -136,7 +136,15 @@
 				<p class="alt-name">{site.altName}</p>
 			{/if}
 			<p class="region">{site.region}</p>
-			<p class="description">{site.description}</p>
+			<!-- Ballochroy hierarchy pass: the archaeological description moved to
+			     History in brief (consolidated, not deleted — it already partly
+			     lived there via the alignment lines). The hero carries an
+			     invitation-led line instead, per the Next-Vigil-dominates brief. -->
+			{#if site.slug === 'ballochroy'}
+				<p class="description">Three stones on a Kintyre farm track, set so they frame the midsummer sunset where it drops behind Jura. The date is the appointment; standing there is how you keep it.</p>
+			{:else}
+				<p class="description">{site.description}</p>
+			{/if}
 			<p class="guide-entry"><a href="#before">Before you go →</a></p>
 		</div>
 	</section>
@@ -167,7 +175,7 @@
 	</section>
 
 	<!-- TILE 4 : NEXT VIGILS -->
-	<section class="tile tile-next">
+	<section class="tile tile-next" class:tile-next-primary={site.slug === 'ballochroy'}>
 		<h2>Next vigils</h2>
 		{#if nextEvents.length > 0}
 			{#each nextEvents as event}
@@ -262,6 +270,12 @@
 	<!-- TILE 6 : HISTORY IN BRIEF -->
 	<section class="tile tile-history">
 		<h2>History in brief</h2>
+		{#if site.slug === 'ballochroy'}
+			<!-- Ballochroy hierarchy pass: the archaeological site description
+			     (moved from the hero, consolidated — no duplication) precedes the
+			     alignment lines. Same canon words, relocated. -->
+			<p class="history-body">{site.description}</p>
+		{/if}
 		{#if site.dateConfidence}
 			<p class="history-body">{site.dateConfidence.evidence}</p>
 		{/if}
@@ -312,6 +326,45 @@
 			"next next next next dark dark dark before before before before before"
 			"book book book book book history history history history location location location";
 		align-items: start;
+	}
+
+	/* Ballochroy hierarchy pass — Next Vigils dominates as the primary
+	   proposition: full-width row directly under the hero, before the
+	   practical/scholarly tiles. Before You Go and Dark Sky drop to a
+	   secondary equal-weight row. Brief-scoped: Ballochroy only. */
+	.field:has(.tile-next-primary) {
+		grid-template-areas:
+			"hero hero hero hero hero hero hero hero hero hero hero hero"
+			"next next next next next next next next next next next next"
+			"dark dark dark dark dark dark before before before before before before"
+			"book book book book book history history history history location location location";
+	}
+	.field:has(.tile-next-primary) .tile-next {
+		/* The invitation row: larger card, more space, stronger type. */
+		background: #131b2e;
+		border: 1px solid #2a3552;
+		border-left: 4px solid #b0a36a;
+		padding: 1.4rem 1.5rem 1.5rem 1.5rem;
+	}
+	.field:has(.tile-next-primary) .tile-next h2 {
+		font-size: 0.85rem;
+		color: #b0a36a;
+	}
+	.field:has(.tile-next-primary) .event-type { font-size: 0.85rem; }
+	.field:has(.tile-next-primary) .event-date {
+		font-size: 1.45rem;
+		letter-spacing: 0.01em;
+	}
+	.field:has(.tile-next-primary) .event-badge { font-size: 1.05rem; }
+	.field:has(.tile-next-primary) .event-desc {
+		font-size: 0.95rem;
+		max-width: 70ch;
+	}
+	.field:has(.tile-next-primary) .event-card { padding: 0.55rem 0; }
+	/* Secondary row tiles read slightly quieter than the invitation. */
+	.field:has(.tile-next-primary) .tile-dark,
+	.field:has(.tile-next-primary) .tile-before {
+		font-size: 0.97em;
 	}
 
 	.tile {
@@ -446,8 +499,10 @@
 	:global(body:has(.field) footer) { border-top-color: #1d2740; }
 	:global(body:has(.field) footer p) { color: #6f7a94; }
 
-	/* Mobile: single-column vertical sequence, priority preserved.
-     Hero → Before you go → Dark sky → Next → Book → History → Location. */
+	/* Mobile: single-column vertical sequence. Base priority (other sites):
+	   Hero → Before you go → Dark sky → Next → Book → History → Location.
+	   Ballochroy (invitation-first pass): Next Vigils jumps ahead of the
+	   practical tiles so the page reads "here's the night" first. */
 	@media (max-width: 820px) {
 		.field {
 			width: 100%;
@@ -458,6 +513,16 @@
 				"before"
 				"dark"
 				"next"
+				"book"
+				"history"
+				"location";
+		}
+		.field:has(.tile-next-primary) {
+			grid-template-areas:
+				"hero"
+				"next"
+				"before"
+				"dark"
 				"book"
 				"history"
 				"location";

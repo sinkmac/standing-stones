@@ -1,5 +1,8 @@
 node_modules
 
+# Local screenshot review artifacts (never committed)
+/_review
+
 # Output
 .output
 .vercel
