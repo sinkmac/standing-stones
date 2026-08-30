@@ -143,7 +143,7 @@
 	<title>{site.name} — Standing Stones & Alignments</title>
 </svelte:head>
 
-{#if site.slug === 'callanish' || site.slug === 'ballochroy'}
+{#if ['callanish', 'ballochroy', 'drombeg', 'maeshowe', 'newgrange', 'clava-cairns'].includes(site.slug)}
 	<FieldInstrument {data} />
 {:else}
 
