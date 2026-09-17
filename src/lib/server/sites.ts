@@ -16,7 +16,7 @@ export interface Alignment {
 	/** Horizon altitude at the bearing in degrees (negative for obscured, 0 for sea horizon) */
 	horizonAltitude: number;
 	/** Whether the alignment is sunrise or sunset */
-	event: 'sunrise' | 'sunset';
+	event: 'sunrise' | 'sunset' | 'moonrise';
 }
 
 export interface AccessInfo {
@@ -270,7 +270,7 @@ export const sites: Site[] = [
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting fieldwork; Higginbottom et al. 2016 (97.87% likelihood). Critiques of broader Thom tradition: Sims 2007, Mediterranean Archaeology & Archaeometry.',
 				bearing: 190,
 				horizonAltitude: 1.0,
-				event: 'sunset'
+				event: 'moonrise'
 			},
 			{
 				type: 'lunar-lunistice-south',
@@ -278,7 +278,7 @@ export const sites: Site[] = [
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting; Higginbottom et al. 2016. Monthly lunistice recognised as a recurring dawn within the standstill cycle.',
 				bearing: 190,
 				horizonAltitude: 1.0,
-				event: 'sunset'
+				event: 'moonrise'
 			}
 		],
 		access: {
