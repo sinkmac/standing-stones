@@ -29,7 +29,8 @@ export interface AppSite {
 }
 
 export interface SiteDataFile {
-	generatedAt: string;
+	// No timestamp on purpose: the file must be byte-stable for a given canon,
+	// or every regeneration would show a spurious diff and defeat the staleness gate.
 	includeDevSite: boolean;
 	canonHash: string;
 	sites: AppSite[];

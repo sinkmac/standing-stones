@@ -74,11 +74,10 @@ export function canonHash(sites: Site[]): string {
 
 export function buildSiteData(
 	canonSites: Site[],
-	opts: { includeDevSite: boolean; devSite?: Site; generatedAt?: string }
+	opts: { includeDevSite: boolean; devSite?: Site }
 ): SiteDataFile {
 	const all = opts.includeDevSite && opts.devSite ? [...canonSites, opts.devSite] : canonSites;
 	return {
-		generatedAt: opts.generatedAt ?? new Date().toISOString(),
 		includeDevSite: opts.includeDevSite,
 		canonHash: canonHash(all),
 		sites: all.map(toAppSite)
