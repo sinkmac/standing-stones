@@ -17,6 +17,7 @@
 	//   window        — "21:08 · 4/6 days window"
 
 	import HeroSky from './HeroSky.svelte';
+	import { emptyBook as emptyBookFor, emptyNext as emptyNextFor } from '$lib/shellStrings';
 
 	let { data }: { data: import('../../routes/[slug]/+page.server').SitePageData } = $props();
 
@@ -97,26 +98,12 @@
 			: `${e.eventTime} · ${e.daysBefore}/${e.daysAfter} days window`;
 	}
 
-	// Empty-register copy: the originally-shipped strings are per-site literals
-	// (Callanish's live page must not reword). The interpolation fallback is
-	// only for sites that never displayed this copy before.
-	const EMPTY_BOOK: Record<string, string[]> = {
-		callanish: [
-			'The Callanish register is quiet — no one has recorded a vigil yet.',
-			'That absence is information too. Yours would be an honest first line.'
-		]
-	};
-	const emptyBook = $derived(
-		EMPTY_BOOK[site.slug] ?? [
-			`The ${site.name} register is quiet — no one has recorded a vigil yet.`,
-			'That absence is information too. Yours would be an honest first line.'
-		]
-	);
-	const emptyNext = $derived(
-		site.slug === 'callanish'
-			? 'No dated upcoming vigil for Callanish is currently available.'
-			: `No dated upcoming vigil for ${site.name} is currently available.`
-	);
+	// Empty-register copy lives in the keyed table (src/lib/shellStrings.ts), not
+	// inside the component — per-site strings inline in a component are what stop a
+	// shell being site-agnostic. Strings are verbatim unchanged (Callanish's live
+	// page must not reword).
+	const emptyBook = $derived(emptyBookFor(site.slug, site.name));
+	const emptyNext = $derived(emptyNextFor(site.slug, site.name));
 </script>
 
 <svelte:head>

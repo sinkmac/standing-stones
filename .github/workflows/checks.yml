@@ -25,14 +25,22 @@ jobs:
       - name: Verify solar solver
         run: npm run verify:solver
 
-      # Added: these two gates existed locally but were NOT enforced in CI, so a
-      # green CI run did not mean "all green". verify:lunar now also carries the
-      # anchor-determinism check.
       - name: Verify rotation logic
         run: npm run verify:rotation
 
       - name: Verify lunar solver (incl. anchor determinism)
         run: npm run verify:lunar
 
-      - name: Build
+      - name: Verify server/client solver parity
+        run: npm run verify:parity
+
+      - name: Verify generated site data (not stale vs canon)
+        run: npm run verify:sitedata
+
+      - name: Verify shell site-agnosticism (incl. Drombeg)
+        run: npm run verify:shell
+
+      # Build runs the verify chain again and finishes with the production-bundle
+      # gate (no dev slug; no service-worker registration with the flag off).
+      - name: Build + production-bundle gate
         run: npm run build

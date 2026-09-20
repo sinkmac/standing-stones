@@ -1,4 +1,9 @@
-// Monthly southern lunar lunistice solver — standalone, zero dependencies.
+// Monthly southern lunar lunistice solver — standalone, GLORIOUSLY zero dependencies.
+//
+// ISOMORPHIC BY CONSTRUCTION: this module lives in src/lib/ (NOT src/lib/server/)
+// so the SAME FILE runs in the server loads, both API routes AND the app shell.
+// One implementation, so server and client cannot disagree. Keep it free of
+// imports and of Node/browser globals: any dependency here breaks the app build.
 //
 // Computes the moon's geocentric ecliptic longitude/latitude (and hence
 // declination + illuminated fraction) from Meeus, "Astronomical Algorithms"

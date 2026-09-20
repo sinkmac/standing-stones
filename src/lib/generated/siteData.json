@@ -1,0 +1,154 @@
+{
+	"generatedAt": "2026-09-20T18:32:51.322Z",
+	"includeDevSite": false,
+	"canonHash": "fnv1a-351a8fb8-2809",
+	"sites": [
+		{
+			"slug": "ballochroy",
+			"name": "Ballochroy",
+			"region": "Kintyre, Scotland",
+			"tier": "surveyed",
+			"latitude": 55.71195,
+			"longitude": -5.61396,
+			"character": "solar",
+			"alignments": [
+				{
+					"type": "summer-solstice",
+					"bearing": 235,
+					"horizonAltitude": 1.5,
+					"daysBefore": 0,
+					"daysAfter": 0
+				}
+			],
+			"darkSky": "Very little artificial light on this stretch of the Kintyre coast, and the sea horizon west towards Jura is unlit. No formal dark-sky designation here — just a quiet road and a long way to the nearest town."
+		},
+		{
+			"slug": "drombeg",
+			"name": "Drombeg Stone Circle",
+			"region": "County Cork, Ireland",
+			"tier": "surveyed",
+			"latitude": 51.56456,
+			"longitude": -9.08702,
+			"character": "solar",
+			"alignments": [
+				{
+					"type": "winter-solstice",
+					"bearing": 225,
+					"horizonAltitude": 1,
+					"daysBefore": 0,
+					"daysAfter": 0
+				}
+			],
+			"darkSky": "Rural West Cork with the Atlantic to the south. Glandore and Rosscarbery put a little light into the eastern sky; the seaward side stays dark."
+		},
+		{
+			"slug": "maeshowe",
+			"name": "Maeshowe",
+			"region": "Orkney, Scotland",
+			"tier": "surveyed",
+			"latitude": 58.9966,
+			"longitude": -3.1882,
+			"character": "solar",
+			"alignments": [
+				{
+					"type": "winter-solstice",
+					"bearing": 225,
+					"horizonAltitude": 0.5,
+					"daysBefore": 0,
+					"daysAfter": 0
+				}
+			],
+			"darkSky": "Managed timed-tour access only — the last tour of the day is 4pm. The winter solstice sunset falls at around 15:15 UTC, which lands inside the 2pm tour, so visitors are in the chamber as sunlight floods the passage. Booking ahead is essential: entry is by managed, limited-capacity timed tour, not open access. Orkney beyond the site has very little light pollution — over twelve hours of true dark around midwinter, no darkness at all from May to July, and the Merry Dancers most likely between October and March."
+		},
+		{
+			"slug": "newgrange",
+			"name": "Newgrange",
+			"region": "County Meath, Ireland",
+			"tier": "surveyed",
+			"latitude": 53.69473,
+			"longitude": -6.47557,
+			"character": "solar",
+			"alignments": [
+				{
+					"type": "winter-solstice",
+					"bearing": 135,
+					"horizonAltitude": 2,
+					"daysBefore": 0,
+					"daysAfter": 0
+				}
+			],
+			"darkSky": "No after-hours access — the solstice mornings, by lottery, are the only exception. The Boyne Valley around it is farmland, dark but for a lift from Drogheda to the east; any night sky here is seen from the surrounding lanes, not the mound."
+		},
+		{
+			"slug": "stonehenge",
+			"name": "Stonehenge",
+			"region": "Wiltshire, England",
+			"tier": "surveyed",
+			"latitude": 51.17889,
+			"longitude": -1.82611,
+			"character": "solar",
+			"alignments": [
+				{
+					"type": "summer-solstice",
+					"bearing": 50,
+					"horizonAltitude": 1,
+					"daysBefore": 14,
+					"daysAfter": 14
+				},
+				{
+					"type": "winter-solstice",
+					"bearing": 230,
+					"horizonAltitude": 1,
+					"daysBefore": 0,
+					"daysAfter": 0
+				}
+			],
+			"darkSky": "The stones close at night. Cranborne Chase, an International Dark Sky Reserve since 2019, begins a short way south — Stonehenge itself sits just outside its boundary, with the A303 running close by."
+		},
+		{
+			"slug": "callanish",
+			"name": "Callanish Stones",
+			"region": "Isle of Lewis, Scotland",
+			"tier": "surveyed",
+			"latitude": 58.19754,
+			"longitude": -6.74514,
+			"character": "moonlit",
+			"alignments": [
+				{
+					"type": "lunar-standstill",
+					"bearing": 159,
+					"horizonAltitude": 1,
+					"daysBefore": 0,
+					"daysAfter": 0
+				},
+				{
+					"type": "lunar-lunistice-south",
+					"bearing": 157,
+					"horizonAltitude": 1,
+					"daysBefore": 0,
+					"daysAfter": 0
+				}
+			],
+			"darkSky": "Among the darkest skies in Britain, with no formal designation and little need for one — the island is largely unlit. No true darkness from late May into July; aurora possible September through April."
+		},
+		{
+			"slug": "clava-cairns",
+			"name": "Balnuaran of Clava",
+			"region": "Highland, Scotland",
+			"tier": "surveyed",
+			"latitude": 57.473,
+			"longitude": -4.074,
+			"character": "solar",
+			"alignments": [
+				{
+					"type": "winter-solstice",
+					"bearing": 225,
+					"horizonAltitude": 1,
+					"daysBefore": 8,
+					"daysAfter": 14
+				}
+			],
+			"darkSky": null
+		}
+	]
+}

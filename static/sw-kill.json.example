@@ -1,0 +1,2 @@
+// rename to sw-kill.json to uninstall the app service worker everywhere, with no deploy
+{ "kill": true }

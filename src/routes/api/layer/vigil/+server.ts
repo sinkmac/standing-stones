@@ -2,7 +2,7 @@ import { json } from '@sveltejs/kit';
 import { sites, isSolarAlignment } from '$lib/server/sites';
 import { calculateNextAlignment } from '$lib/server/alignments';
 import type { AlignmentEvent } from '$lib/server/alignments';
-import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/server/lunarLunistice';
+import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/lunarLunistice';
 import { getSiteVigilStats } from '$lib/server/vigil';
 
 /**

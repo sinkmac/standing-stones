@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { getSite, isSolarAlignment } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
-import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/server/lunarLunistice';
+import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/lunarLunistice';
 import { getVigilsForSite, getSiteVigilStats, type VigilEntry } from '$lib/server/vigil';
 import { calculateAncestralSky, type AncestralSkyResult } from '$lib/server/ancestral';
 import { SKY_BANDS } from '$lib/skyPalette';

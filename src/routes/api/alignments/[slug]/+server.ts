@@ -1,7 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { getSite, isSolarAlignment } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
-import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/server/lunarLunistice';
+import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/lunarLunistice';
 import { getVigilsForSite, getSiteVigilStats } from '$lib/server/vigil';
 
 export async function GET({ params }) {

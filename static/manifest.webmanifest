@@ -1,0 +1,15 @@
+{
+	"name": "Standing Stones: Vigil",
+	"short_name": "Vigil",
+	"description": "A calendar of ancient appointments.",
+	"start_url": "/app",
+	"scope": "/app",
+	"display": "standalone",
+	"background_color": "#04060e",
+	"theme_color": "#04060e",
+	"icons": [
+		{ "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+		{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+		{ "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+	]
+}

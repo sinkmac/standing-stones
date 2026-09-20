@@ -8,14 +8,19 @@
 	},
 	"scripts": {
 		"dev": "vite dev",
-		"build": "node --experimental-strip-types scripts/verify-solver-fix.ts && node --experimental-strip-types scripts/verify-lunar-solver.ts && vite build",
+		"build": "node --experimental-strip-types scripts/verify-solver-fix.ts && node --experimental-strip-types scripts/verify-lunar-solver.ts && node --experimental-strip-types scripts/verify-solver-parity.ts && node --experimental-strip-types scripts/verify-site-data.ts && node --experimental-strip-types scripts/verify-shell.ts && vite build && node --experimental-strip-types scripts/verify-prod-bundle.ts",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"verify:solver": "node --experimental-strip-types scripts/verify-solver-fix.ts",
 		"verify:rotation": "node --experimental-strip-types scripts/verify-rotation.ts",
-		"verify:lunar": "node --experimental-strip-types scripts/verify-lunar-solver.ts"
+		"verify:lunar": "node --experimental-strip-types scripts/verify-lunar-solver.ts",
+		"verify:parity": "node --experimental-strip-types scripts/verify-solver-parity.ts",
+		"gen:sitedata": "node --experimental-strip-types scripts/generate-site-data.ts",
+		"verify:sitedata": "node --experimental-strip-types scripts/verify-site-data.ts",
+		"verify:shell": "node --experimental-strip-types scripts/verify-shell.ts",
+		"verify:prodbundle": "node --experimental-strip-types scripts/verify-prod-bundle.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
