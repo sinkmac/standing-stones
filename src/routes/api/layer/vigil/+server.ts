@@ -1,8 +1,8 @@
 import { json } from '@sveltejs/kit';
-import { sites } from '$lib/server/sites';
+import { sites, isSolarAlignment } from '$lib/server/sites';
 import { calculateNextAlignment } from '$lib/server/alignments';
 import type { AlignmentEvent } from '$lib/server/alignments';
-import { calculateNextLunarLunistice } from '$lib/server/lunarLunistice';
+import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/server/lunarLunistice';
 import { getSiteVigilStats } from '$lib/server/vigil';
 
 /**
@@ -53,11 +53,13 @@ type VigilEvent = AlignmentEvent & {
 
 /** Human-readable window description for a southern lunistice (matches the solar style). */
 function lunarWindowDescription(lev: NonNullable<ReturnType<typeof calculateNextLunarLunistice>>): string {
-	const moonriseTime = lev.datetime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-	return `Monthly southern lunistice — the moon reaches declination ${lev.declinationDeg.toFixed(1)}° ` +
-		`(its most southerly extent this draconic month) on ${lev.datetime.toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })} ` +
-		`and rises at ${Math.round(lev.riseAzimuthDeg)}° from north, skimming the Sleeping Beauty ridge to the south. ` +
-		`Moon phase: ${lev.phaseBand} (${Math.round(lev.phase * 100)}%). Best seen at moonrise (~${moonriseTime} local) that evening.`;
+	const dateLocal = lev.datetime.toLocaleDateString('en-GB', {
+		day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/London'
+	});
+	return `Monthly southern lunistice — the moon reaches its most southerly declination of the month ` +
+		`(${lev.declinationDeg.toFixed(1)}°) on ${dateLocal}, rising low from the Sleeping Beauty ridge ` +
+		`to the south-east. ` +
+		`Time is approximate to within about an hour. Moon phase: ${lev.phaseBand} (${Math.round(lev.phase * 100)}%).`;
 }
 
 export async function GET({ url }: { url: URL }) {
@@ -107,7 +109,7 @@ export async function GET({ url }: { url: URL }) {
 							dateRange: lev.datetime.toLocaleDateString('en-GB', {
 								weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
 							}),
-							eventTime: lev.datetime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+							eventTime: lunisticeLocalWindow(lev.datetime),
 							daysBefore: 0,
 							daysAfter: 0,
 							windowDescription: lunarWindowDescription(lev),
@@ -116,7 +118,7 @@ export async function GET({ url }: { url: URL }) {
 							moonriseAzimuthDeg: lev.riseAzimuthDeg,
 							moonPhase: lev.phaseBand
 						} : null;
-					} else {
+					} else if (isSolarAlignment(al)) {
 						ev = calculateNextAlignment(
 							site.latitude,
 							site.longitude,

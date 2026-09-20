@@ -15,8 +15,23 @@ export interface Alignment {
 	bearing: number;
 	/** Horizon altitude at the bearing in degrees (negative for obscured, 0 for sea horizon) */
 	horizonAltitude: number;
-	/** Whether the alignment is sunrise or sunset */
+	/** Solar rise/set event; 'moonrise' is carried by the lunar alignments, which the solar solver must never receive. */
 	event: 'sunrise' | 'sunset' | 'moonrise';
+}
+
+/**
+ * Narrow an alignment to one the SOLAR solver may compute.
+ *
+ * `event` was widened to carry `'moonrise'` for the Callanish lunar alignments,
+ * but the solar solver only understands sunrise/sunset. Lunar alignments are
+ * handled by their own solver and must never reach the solar path. This guard
+ * skips them AND narrows `event`, so the wide union can't be passed to
+ * `calculateNextAlignment`.
+ */
+export function isSolarAlignment(
+	a: Alignment
+): a is Alignment & { event: 'sunrise' | 'sunset' } {
+	return !a.type.includes('lunar');
 }
 
 export interface AccessInfo {
@@ -266,17 +281,23 @@ export const sites: Site[] = [
 		alignments: [
 			{
 				type: 'lunar-standstill',
-				description: 'Lunar standstill (major standstill, ~18.6-year cycle) — the cross-shaped layout aligns with the moon at its extreme declination',
+				description: 'Major lunar standstill (~18.6-year cycle) — a multi-year condition, not a single-night event; during it the moon\'s monthly southern extremes reach their widest range. The cross-shaped layout aligns with the moon at its extreme declination',
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting fieldwork; Higginbottom et al. 2016 (97.87% likelihood). Critiques of broader Thom tradition: Sims 2007, Mediterranean Archaeology & Archaeometry.',
-				bearing: 190,
+				// Calculated rise azimuth of the southern-extreme moon (~153 deg, a SKY
+				// value, geocentric; ~150 deg with parallax) — NOT a terrain sightline. The
+				// set end is SW: Clisham range / Glen Langadale, ~207 deg set azimuth.
+				bearing: 153,
 				horizonAltitude: 1.0,
 				event: 'moonrise'
 			},
 			{
 				type: 'lunar-lunistice-south',
-				description: 'Monthly southern lunistice (~27.21-day draconic month) — at the moon\'s most southerly extent each month, its low moonrise skims the Sleeping Beauty ridge to the south; the southern stone row frames this event',
+				description: 'Monthly southern lunistice — the moon reaches its most southerly declination about every 27 days; the recurrence is governed by the tropical month (~27.32 d), not the 27.21 d draconic month. It rises low from the Sleeping Beauty ridge to the south-east; the southern stone row frames this event',
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting; Higginbottom et al. 2016. Monthly lunistice recognised as a recurring dawn within the standstill cycle.',
-				bearing: 190,
+				// Calculated rise azimuth of the southern-extreme moon (~153 deg, a SKY
+				// value, geocentric; ~150 deg with parallax) — NOT a terrain sightline. The
+				// set end is SW: Clisham range / Glen Langadale, ~207 deg set azimuth.
+				bearing: 153,
 				horizonAltitude: 1.0,
 				event: 'moonrise'
 			}

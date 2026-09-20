@@ -1,4 +1,4 @@
-import { getSite, sites } from '$lib/server/sites';
+import { getSite, sites, isSolarAlignment } from '$lib/server/sites';
 import { calculateNextAlignment } from '$lib/server/alignments';
 import { getSiteVigilStats, getAllVigils } from '$lib/server/vigil';
 import { SKY_BANDS } from '$lib/skyPalette';
@@ -46,7 +46,7 @@ const PRACTICAL_LINE: Record<string, string> = {
 	ballochroy: 'Often it is raining.',
 	drombeg: 'The circle is small. The sky around it is wide.',
 	callanish:
-		'No fixed alignment is tracked here — the sky itself is the constant. There is no wrong time to come.'
+		'The moon reaches its southern limit here roughly every 27 days. Whether the stones were set to catch it, no one can say.'
 };
 
 const DAY = 86_400_000;
@@ -61,7 +61,7 @@ function nextEvent(slug: string, now: Date): { daysUntil: number; withinWindow: 
 	if (!site) return null;
 
 	for (const a of site.alignments) {
-		if (a.type.includes('lunar')) continue;
+		if (!isSolarAlignment(a)) continue;
 		const e = calculateNextAlignment(
 			site.latitude,
 			site.longitude,

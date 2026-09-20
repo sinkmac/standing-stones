@@ -7,11 +7,18 @@
 // pymeeus faithful Meeus port (MIT/LGPL, https://github.com/architest/pymeeus
 // , pymeeus/Moon.py) to avoid transcription drift from the printed book.
 //
-// A southern monthly lunistice is the moment in each draconic month (~27.21 d)
-// when the moon reaches its most southerly declination (the local minimum of
-// declination): the moon rises at its most southerly azimuth. The major lunar
-// standstill (18.6-yr cycle) peaked 2025 and is now descending toward the
-// minor standstill ~2033, so the exact southern declination reached declines
+// A southern monthly lunistice is the moment each month when the moon reaches
+// its most southerly declination (the local minimum of declination): the moon
+// rises at its most southerly azimuth. The RECURRENCE is governed by the
+// TROPICAL month (~27.32 d) — the moon's return to the same ecliptic longitude
+// (~270 deg, the solstitial point) — modulated by the DRACONIC month (~27.21 d)
+// through the ecliptic-latitude term. It is NOT the draconic month alone: the
+// draconic/nodal cycle governs the 18.6-yr standstill, not the monthly cadence.
+// Measured mean spacing of the declination minima (2026-01..2027-10, 1-hour grid)
+// is ~27.28 d, jittering ~27.21-27.33 d.
+//
+// The major lunar standstill (18.6-yr cycle) peaked 2025 and is descending toward
+// the minor standstill ~2033, so the exact southern declination reached declines
 // year on year, but a monthly lunistice is always present.
 //
 // Mirrors the house style of alignments.ts: mean equinox of date, no nutation
@@ -201,6 +208,14 @@ export function moonPosition(jd: number): MoonInstant {
 	return { eclipticLon: lon, eclipticLat: lat, declination: dec, rightAscension: ra, phase };
 }
 
+/** Local civil-time window (Europe/London, DST-aware) for a lunistice at the
+ *  solver's honest ~1-hour resolution. e.g. "~03:00-04:00". Never a minute. */
+export function lunisticeLocalWindow(dt: Date): string {
+	const hh = Number(dt.toLocaleTimeString('en-GB', { hour: '2-digit', hour12: false, timeZone: 'Europe/London' }));
+	const pad = (n: number) => String(((n % 24) + 24) % 24).padStart(2, '0');
+	return `~${pad(hh)}:00-${pad(hh + 1)}:00`;
+}
+
 export function moonPhaseBand(phase: number): string {
 	const p = phase * 100;
 	if (p < 5) return 'new';
@@ -211,7 +226,7 @@ export function moonPhaseBand(phase: number): string {
 }
 
 export interface LunarLunistice {
-	/** Instant of the lunistice (UTC) — the next local minimum of declination */
+	/** Instant of the lunistice (UTC), to ~1-hour grid accuracy — see findNextSouthernLunistice */
 	datetime: Date;
 	/** Southern declination at that instant (degrees, negative) */
 	declinationDeg: number;
@@ -234,9 +249,15 @@ export function moonriseAzimuth(declinationDeg: number, latitude: number): numbe
 
 /**
  * Find the next southern monthly lunistice after `fromDate`.
- * Steps forward in 1-hour increments over a ~40-day window (the draconic month
- * is ~27.2 d, so the next southern extremum always falls inside) and locates
+ * Steps forward in 1-hour increments over a ~40-day window (the ~27.3-day
+ * recurrence means the next southern extremum always falls inside) and locates
  * the local minimum (most-negative) of declination. No hardcoded date.
+ *
+ * PRECISION: the returned instant is one point on a 1-hour grid anchored at
+ * `fromDate`; the true declination minimum can lie up to +/-0.5 h from it, and
+ * the anchor moves with the request time. `datetime` therefore carries no more
+ * than ~1-hour accuracy — do not present the minute. `declinationDeg` is
+ * converged (sub-0.001 deg) and is not affected.
  */
 export function findNextSouthernLunistice(fromDate: Date, latitude: number, windowDays = 40): LunarLunistice | null {
 	try {

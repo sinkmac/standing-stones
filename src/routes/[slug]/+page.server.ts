@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { getSite } from '$lib/server/sites';
+import { getSite, isSolarAlignment } from '$lib/server/sites';
 import { calculateNextAlignment, getLocationSkySummary } from '$lib/server/alignments';
-import { calculateNextLunarLunistice } from '$lib/server/lunarLunistice';
+import { calculateNextLunarLunistice, lunisticeLocalWindow } from '$lib/server/lunarLunistice';
 import { getVigilsForSite, getSiteVigilStats, type VigilEntry } from '$lib/server/vigil';
 import { calculateAncestralSky, type AncestralSkyResult } from '$lib/server/ancestral';
 import { SKY_BANDS } from '$lib/skyPalette';
@@ -51,12 +51,12 @@ export async function load({ params }): Promise<SitePageData> {
 					dateRange: lev.datetime.toLocaleDateString('en-GB', {
 						weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
 					}),
-					eventTime: lev.datetime.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+					eventTime: lunisticeLocalWindow(lev.datetime),
 					daysBefore: 0,
 					daysAfter: 0,
-					windowDescription: `Monthly southern lunistice — the moon reaches declination ${lev.declinationDeg.toFixed(1)}° ` +
-						`and rises at ${Math.round(lev.riseAzimuthDeg)}° from north, skimming the Sleeping Beauty ridge. ` +
-						`Moon phase: ${lev.phaseBand}.`,
+					windowDescription: `Monthly southern lunistice — the moon reaches its most southerly declination of the month (${lev.declinationDeg.toFixed(1)}°) ` +
+						`and rises low from the Sleeping Beauty ridge to the south-east. ` +
+						`Time is approximate to within about an hour. Moon phase: ${lev.phaseBand}.`,
 					isPrecise: site.tier === 'surveyed',
 					alignmentType: 'lunar-lunistice-south' as const,
 					moonDeclinationDeg: lev.declinationDeg,
@@ -64,6 +64,7 @@ export async function load({ params }): Promise<SitePageData> {
 					moonPhase: lev.phaseBand
 				} : null;
 			}
+			if (!isSolarAlignment(a)) return null;
 			const solar = calculateNextAlignment(
 				site.latitude,
 				site.longitude,
