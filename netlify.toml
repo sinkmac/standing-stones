@@ -3,3 +3,15 @@
 
 [build.environment]
   NODE_VERSION = "22"
+
+# BRANCH-DEPLOY ONLY (this branch: field-test).
+#
+# Enables the app's service worker so the real-phone install and aeroplane-mode
+# test can be run against a deploy that is NOT production. Production keeps
+# PUBLIC_SW_ENABLED unset, so its bundle carries no service-worker registration
+# at all (asserted by scripts/verify-prod-bundle.ts). Enabling it on production is
+# the later, deliberate step, only after the phone test passes.
+#
+# This block is scoped to the branch, so it is inert on main.
+[context.field-test.environment]
+  PUBLIC_SW_ENABLED = "true"
