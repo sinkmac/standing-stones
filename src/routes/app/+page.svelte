@@ -21,7 +21,10 @@
 			location.reload();
 			return;
 		}
-		swState = await registerAppShellServiceWorker(siteData.canonHash);
+		// __BUILD_ID__ changes every deploy, so a fixed worker actually replaces the
+		// old one on the device. (The canon hash does not change per deploy and would
+		// have left a stale worker in place.)
+		swState = await registerAppShellServiceWorker(__BUILD_ID__);
 	});
 </script>
 

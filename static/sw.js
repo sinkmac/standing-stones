@@ -49,6 +49,27 @@ self.addEventListener('fetch', function (e) {
   if (url.origin !== self.location.origin) return;
   // ONLY app-shell navigations. The site's own routes and every API route are
   // never intercepted - that is what keeps the existing website correct.
+  // Build assets of the app shell: content-hashed and immutable under /_app/,
+  // so cache-first is safe for them. Without this, an offline open returns the
+  // cached HTML but no CSS or JS - an unstyled shell, not a working screen.
+  // These are assets, not routes: the site's pages and every API route are still
+  // never intercepted, and this changes nothing for a non-installed visitor.
+  if (url.pathname.indexOf('/_app/') === 0) {
+    e.respondWith((async function () {
+      const c = await caches.open(CACHE);
+      const hit = await c.match(e.request);
+      if (hit) return hit;
+      try {
+        const r = await fetch(e.request);
+        if (r && r.ok) c.put(e.request, r.clone());
+        return r;
+      } catch (_) {
+        return (await c.match(e.request)) || Response.error();
+      }
+    })());
+    return;
+  }
+
   if (e.request.mode === 'navigate' && url.pathname.indexOf('/app') === 0) {
     e.respondWith((async function () {
       if (await killed()) { await uninstall(); return fetch(e.request); }

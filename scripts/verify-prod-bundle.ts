@@ -72,6 +72,14 @@ if (existsSync(swPath)) {
 	// strip comments first: the file's own comment mentions skipWaiting by name
 	const swCode = sw.split('\n').filter(l => !l.trimStart().startsWith('//')).join('\n');
 	check('SW never calls skipWaiting outside a kill', !/skipWaiting/.test(swCode), 'no skipWaiting in code');
+	const touched = sw.match(/url\.pathname\.indexOf\('([^']+)'\)/g) || [];
+	const prefixes = touched.map(t => t.replace(/.*indexOf\('/, '').replace(/'\).*/, ''));
+	check('SW only ever intercepts app-shell paths', prefixes.length > 0 &&
+		prefixes.every(p => p === '/app' || p === '/_app/'),
+		`intercepts: ${prefixes.join(', ')}`);
+	check('SW never references the API', !swCode.includes('/api'), 'no /api');
+	check('SW caches the shell build assets (so offline actually renders)',
+		sw.includes('/_app/'), 'asset caching present');
 }
 
 console.log('');
