@@ -253,25 +253,34 @@ export function moonriseAzimuth(declinationDeg: number, latitude: number): numbe
  * recurrence means the next southern extremum always falls inside) and locates
  * the local minimum (most-negative) of declination. No hardcoded date.
  *
- * PRECISION: the returned instant is one point on a 1-hour grid anchored at
- * `fromDate`; the true declination minimum can lie up to +/-0.5 h from it, and
- * the anchor moves with the request time. `datetime` therefore carries no more
- * than ~1-hour accuracy — do not present the minute. `declinationDeg` is
- * converged (sub-0.001 deg) and is not affected.
+ * DETERMINISM: the 1-hour grid has a FIXED anchor — 00:00 UTC of fromDate's UTC
+ * date — not the request instant. Every grid point is a whole UTC hour, so the
+ * same lunistice resolves to the same extremum, and therefore the same rendered
+ * window, no matter when the search runs. (A UK local midnight is a whole-hour
+ * offset from UTC, so this enumerates the same grid.)
+ *
+ * PRECISION: the returned instant is one point on that grid; the true declination
+ * minimum can lie up to +/-0.5 h from it. `datetime` therefore carries ~1-hour
+ * accuracy — do not present the minute. `declinationDeg` is converged
+ * (sub-0.001 deg) and is not affected.
  */
 export function findNextSouthernLunistice(fromDate: Date, latitude: number, windowDays = 40): LunarLunistice | null {
 	try {
-		const jd0 = toJulian(fromDate);
+		const fromJd = toJulian(fromDate);
+		// FIXED anchor (see DETERMINISM above): 00:00 UTC of fromDate's UTC date.
+		const anchorJd = Math.floor(fromJd - 0.5) + 0.5;
 		const step = 1 / 24; // 1 hour
-		let prevJd = jd0;
+		const steps = Math.floor(windowDays * 24);
+		let prevJd = anchorJd;
 		let prevDec = moonPosition(prevJd).declination;
 		let best: { jd: number; dec: number } | null = null;
 
-		for (let j = jd0 + step; j <= jd0 + windowDays; j += step) {
+		for (let k = 1; k <= steps; k++) {
+			const j = anchorJd + k * step;
 			const dec = moonPosition(j).declination;
 			const beforePrevDec = moonPosition(prevJd - step).declination; // sample before prevJd
-			// local minimum: prevJd is lower than both neighbours
-			if (dec > prevDec && prevDec < beforePrevDec && prevJd > jd0) {
+			// local minimum: prevJd is lower than both neighbours, and still ahead of the request
+			if (dec > prevDec && prevDec < beforePrevDec && prevJd > fromJd) {
 				if (!best || prevDec < best.dec) best = { jd: prevJd, dec: prevDec };
 			}
 			prevJd = j;
@@ -280,7 +289,7 @@ export function findNextSouthernLunistice(fromDate: Date, latitude: number, wind
 		if (!best) return null;
 
 		const p = moonPosition(best.jd);
-		const daysUntil = Math.round(best.jd - jd0);
+		const daysUntil = Math.round(best.jd - fromJd);
 		return {
 			datetime: fromJulian(best.jd),
 			declinationDeg: best.dec * RAD,

@@ -4,7 +4,7 @@
 //   2026-08-22 ~11:00 UTC, declination -28.12, rise az ~153.4 deg (gibbous).
 // Also sanity-checks Ballochroy's solar solver is unchanged, and the failure
 // path (no throw) returns null so the route can emit a gap.
-import { calculateNextLunarLunistice, findNextSouthernLunistice, moonPosition, moonriseAzimuth, moonPhaseBand } from '../src/lib/server/lunarLunistice.ts';
+import { calculateNextLunarLunistice, findNextSouthernLunistice, moonPosition, moonriseAzimuth, moonPhaseBand, lunisticeLocalWindow } from '../src/lib/server/lunarLunistice.ts';
 import { getSunriseSunset, getSeasons } from '../src/lib/server/alignments.ts';
 import { getSite } from '../src/lib/server/sites.ts';
 
@@ -82,6 +82,37 @@ check('callanish has lunar-lunistice-south alignment',
 	callanishSite?.alignments.map(a => a.type).join(', ') || 'no site');
 check('callanish still has lunar-standstill alignment',
 	callanishSite?.alignments.some(a => a.type === 'lunar-standstill') === true, 'kept separate');
+
+// ---- ANCHOR DETERMINISM: one event, many request instants -> one window ----
+console.log('--- ANCHOR DETERMINISM (build gate) ---');
+{
+	// A spread of request instants that all share the SAME upcoming lunistice:
+	// several days x several hours x several minutes, over 2026-08-10..08-21
+	// (the reference event is 2026-08-22 ~11:00 UTC; the previous one is ~26 Jul).
+	const probes: Date[] = [];
+	for (const daysBefore of [1, 2, 3, 6, 9, 12]) {
+		for (const h of [0, 4, 8, 12, 16, 20]) {
+			for (const m of [0, 17, 43]) {
+				probes.push(new Date(Date.UTC(2026, 7, 22 - daysBefore, h, m, 31)));
+			}
+		}
+	}
+	const instants = new Set<string>();
+	const windows = new Set<string>();
+	for (const t of probes) {
+		const r = findNextSouthernLunistice(t, LAT);
+		if (!r) { instants.add('null'); windows.add('null'); continue; }
+		instants.add(r.datetime.toISOString());
+		windows.add(lunisticeLocalWindow(r.datetime));
+	}
+	const inst = [...instants], win = [...windows];
+	check('same event, all request instants -> one instant', inst.length === 1,
+		`${inst.length} distinct over ${probes.length} probes: ${inst.join(' | ')}`);
+	check('same event, all request instants -> one window', win.length === 1,
+		`${win.length} distinct: ${win.join(' | ')}`);
+	check('window matches the reference event hour', win[0] === lunisticeLocalWindow(new Date(Date.UTC(2026, 7, 22, 11, 0, 0))),
+		`got ${win[0]}`);
+}
 
 console.log('');
 console.log(failures === 0 ? 'ALL LUNAR CHECKS PASSED' : `${failures} CHECK(S) FAILED`);
