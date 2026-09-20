@@ -5,7 +5,7 @@
 	import { page } from '$app/state';
 	import { allAppSites, getAppSite, siteData } from '$lib/appData';
 	import { registerAppShellServiceWorker, applyKillSwitchIfPresent, SW_ENABLED } from '$lib/pwa';
-	import AppShell from '$lib/components/AppShell.svelte';
+	import VigilSequence from '$lib/components/VigilSequence.svelte';
 
 	const sites = allAppSites();
 	const fallback = sites.find(s => s.character === 'moonlit')?.slug ?? sites[0]?.slug;
@@ -38,7 +38,9 @@
 </svelte:head>
 
 {#if site}
-	<AppShell {site} />
+	{#key site.slug}
+		<VigilSequence {site} />
+	{/key}
 
 	<nav class="switch">
 		{#each sites as s}
@@ -54,20 +56,30 @@
 
 <style>
 	.switch {
-		max-width: 40rem;
+		max-width: 42rem;
 		margin: 0 auto;
-		padding: 0 1.25rem 1.5rem;
+		padding: 0 1rem 1.5rem;
 		display: flex;
 		flex-wrap: wrap;
 		gap: 0.75rem;
 		background: #04060e;
 	}
-	.switch a { color: #8e9ab5; text-decoration: none; font-size: 0.85rem; padding: 0.5rem 0; }
-	.switch a[aria-current='true'] { color: #d9c27a; }
+	.switch a {
+		color: #8e9ab5;
+		text-decoration: none;
+		font-size: 0.85rem;
+		padding: 0.5rem 0;
+		min-height: 44px;
+		display: inline-flex;
+		align-items: center;
+	}
+	.switch a[aria-current='true'] {
+		color: #d9c27a;
+	}
 	.pwa {
-		max-width: 40rem;
+		max-width: 42rem;
 		margin: 0 auto;
-		padding: 0 1.25rem 2rem;
+		padding: 0 1rem 2rem;
 		color: #55607a;
 		font-size: 0.75rem;
 	}

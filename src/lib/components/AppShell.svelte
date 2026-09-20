@@ -2,6 +2,12 @@
 	// The app shell — it takes a Site record and NOTHING else. What kind of
 	// appointment the site has is read from its alignment data, so this component
 	// has no knowledge of any particular site.
+	//
+	// NOTE (Phase 2): the /app route now renders the field sequence
+	// (VigilSequence.svelte), which carries the site header, the next appointment
+	// AND the field screens. This read-only shell is retained deliberately — it is
+	// the plain "site + next appointment" view with no field surfaces, and a later
+	// pass can re-expose it as an at-a-glance screen. It is not imported by the route.
 	import type { AppSite } from '$lib/appData';
 	import { nextAppointment } from '$lib/appShell';
 

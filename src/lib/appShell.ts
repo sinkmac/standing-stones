@@ -15,6 +15,9 @@ export interface LunarAppointment {
 	label: string;
 	dateRange: string;
 	window: string;
+	/** ISO instant of the window start (the solver's ~1-hour grid point). The
+	 *  countdown uses it; it is never shown to the minute. */
+	windowStartIso: string;
 	windowDescription: string;
 	daysUntil: number;
 }
@@ -68,6 +71,7 @@ export function nextAppointment(site: AppSite, now: Date = new Date()): Appointm
 			label: alignmentLabel(a.type),
 			dateRange,
 			window: lunisticeLocalWindow(lev.datetime),
+			windowStartIso: lev.datetime.toISOString(),
 			windowDescription:
 				`${alignmentLabel(a.type)} — the moon reaches its most southerly declination of the month ` +
 				`(${lev.declinationDeg.toFixed(1)}°) and rises ${terrainLine(site.slug)}. ` +

@@ -40,6 +40,9 @@ jobs:
       - name: Verify shell site-agnosticism (incl. Drombeg)
         run: npm run verify:shell
 
+      - name: Verify field screens (true north, no white surfaces, offline, no verification wording)
+        run: npm run verify:field
+
       # Build runs the verify chain again and finishes with the production-bundle
       # gate (no dev slug; no service-worker registration with the flag off).
       - name: Build + production-bundle gate
