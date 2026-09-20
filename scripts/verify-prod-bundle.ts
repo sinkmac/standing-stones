@@ -31,8 +31,16 @@ console.log('--- PRODUCTION BUNDLE ---');
 check('build output present', files.length > 0, `${files.length} files scanned in ${OUTPUT_DIRS.join(', ')}`);
 
 const baddies = files.filter(f => readFileSync(f, 'utf8').includes(DEV_SLUG));
-check('no dev-only site slug anywhere in the build output', baddies.length === 0,
-	baddies.length ? baddies.join(', ') : `no '${DEV_SLUG}'`);
+// A PRODUCTION build must never carry the dev site. Field testing needs the dev
+// site on a real phone, so that build has to say so explicitly: FIELD_TEST=1.
+// The default is strict, so a forgotten INCLUDE_DEV_SITE=1 still fails the build.
+if (process.env.FIELD_TEST === '1') {
+	check('dev-only site present for an EXPLICIT field-test build', baddies.length > 0,
+		`${baddies.length} file(s) carry '${DEV_SLUG}' - NOT a production build`);
+} else {
+	check('no dev-only site slug anywhere in the build output', baddies.length === 0,
+		baddies.length ? baddies.join(', ') : `no '${DEV_SLUG}'`);
+}
 
 // Specific to OUR registration: the call AND our versioned SW url together.
 // (A bare /serviceWorker\.register/ also matches SvelteKit's own runtime string
