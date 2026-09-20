@@ -58,7 +58,7 @@ function lunarWindowDescription(lev: NonNullable<ReturnType<typeof calculateNext
 	});
 	return `Monthly southern lunistice — the moon reaches its most southerly declination of the month ` +
 		`(${lev.declinationDeg.toFixed(1)}°) on ${dateLocal}, rising low from the Sleeping Beauty ridge ` +
-		`to the south-east. ` +
+		`to the south-south-east. ` +
 		`Time is approximate to within about an hour. Moon phase: ${lev.phaseBand} (${Math.round(lev.phase * 100)}%).`;
 }
 

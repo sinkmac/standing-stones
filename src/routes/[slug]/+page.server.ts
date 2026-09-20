@@ -55,7 +55,7 @@ export async function load({ params }): Promise<SitePageData> {
 					daysBefore: 0,
 					daysAfter: 0,
 					windowDescription: `Monthly southern lunistice — the moon reaches its most southerly declination of the month (${lev.declinationDeg.toFixed(1)}°) ` +
-						`and rises low from the Sleeping Beauty ridge to the south-east. ` +
+						`and rises low from the Sleeping Beauty ridge to the south-south-east. ` +
 						`Time is approximate to within about an hour. Moon phase: ${lev.phaseBand}.`,
 					isPrecise: site.tier === 'surveyed',
 					alignmentType: 'lunar-lunistice-south' as const,

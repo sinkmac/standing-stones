@@ -283,21 +283,25 @@ export const sites: Site[] = [
 				type: 'lunar-standstill',
 				description: 'Major lunar standstill (~18.6-year cycle) — a multi-year condition, not a single-night event; during it the moon\'s monthly southern extremes reach their widest range. The cross-shaped layout aligns with the moon at its extreme declination',
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting fieldwork; Higginbottom et al. 2016 (97.87% likelihood). Critiques of broader Thom tradition: Sims 2007, Mediterranean Archaeology & Archaeometry.',
-				// Calculated rise azimuth of the southern-extreme moon (~153 deg, a SKY
-				// value, geocentric; ~150 deg with parallax) — NOT a terrain sightline. The
-				// set end is SW: Clisham range / Glen Langadale, ~207 deg set azimuth.
-				bearing: 153,
+				// Calculated rise azimuth of the southern-extreme moon AT THE MAJOR STANDSTILL,
+				// corrected for the Sleeping Beauty horizon (this record's horizonAltitude
+				// 1.0 deg, independently measured at ~1.0-1.1): ~159 deg (dec ~ -28.6).
+				// Further south than an ordinary month (~157 deg). A multi-year condition,
+				// so this is the cycle-peak maximum, not one night's rise azimuth.
+				bearing: 159,
 				horizonAltitude: 1.0,
 				event: 'moonrise'
 			},
 			{
 				type: 'lunar-lunistice-south',
-				description: 'Monthly southern lunistice — the moon reaches its most southerly declination about every 27 days; the recurrence is governed by the tropical month (~27.32 d), not the 27.21 d draconic month. It rises low from the Sleeping Beauty ridge to the south-east; the southern stone row frames this event',
+				description: 'Monthly southern lunistice — the moon reaches its most southerly declination about every 27 days; the recurrence is governed by the tropical month (~27.32 d), not the 27.21 d draconic month. It rises low from the Sleeping Beauty ridge to the south-south-east; the southern stone row frames this event',
 				source: 'Thom, A. Megalithic Lunar Observatories (1971); Curtis & Ponting; Higginbottom et al. 2016. Monthly lunistice recognised as a recurring dawn within the standstill cycle.',
-				// Calculated rise azimuth of the southern-extreme moon (~153 deg, a SKY
-				// value, geocentric; ~150 deg with parallax) — NOT a terrain sightline. The
-				// set end is SW: Clisham range / Glen Langadale, ~207 deg set azimuth.
-				bearing: 153,
+				// Calculated rise azimuth of the southern-extreme moon, corrected for the
+				// Sleeping Beauty horizon (this record's horizonAltitude 1.0 deg, independently
+				// measured at ~1.0-1.1): ~157 deg (dec ~ -28.1). This is the number that
+				// matches the terrain — the ridge (its knees) lies at ~158 deg. The solver's
+				// riseAzimuthDeg is the flat-horizon geocentric ~153 deg: a different quantity.
+				bearing: 157,
 				horizonAltitude: 1.0,
 				event: 'moonrise'
 			}
