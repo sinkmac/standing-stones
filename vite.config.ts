@@ -26,6 +26,11 @@ export default defineConfig({
 	//   __BUILD_ID__ versions the worker URL per deploy.
 	define: {
 		__SW_ENABLED__: JSON.stringify(process.env.PUBLIC_SW_ENABLED === 'true'),
+		// The SAME flag that gates the dev-only test site (see scripts/dev-site.ts
+		// and generate-site-data.ts). Injected into client code so dev-test material
+		// can be eliminated from a production bundle rather than merely skipped at
+		// runtime - e.g. the field-test point's declination entry.
+		__INCLUDE_DEV_SITE__: JSON.stringify(process.env.INCLUDE_DEV_SITE === '1'),
 		__BUILD_ID__: JSON.stringify(BUILD_ID)
 	},
 	plugins: [

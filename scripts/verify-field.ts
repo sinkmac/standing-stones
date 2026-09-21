@@ -12,19 +12,24 @@
 //   6. The sequence round-trips (re-entry never loses state).
 //   7. The whole field flow is offline: no fetch / XHR / http in the modules.
 import { readFileSync } from 'node:fs';
-import {
-	DECLINATION_TABLE,
-	declinationAt,
-	declinationFor,
-	fractionalYear,
-	magneticToTrue,
-	angleDiff
-} from '../src/lib/declination.ts';
-import { FIELD_PALETTE, NIGHT_PALETTE, SURFACE_KEYS, relativeLuminance, isDarkSurface } from '../src/lib/fieldPalette.ts';
-import { FIELD_COPY, STEP_LABELS } from '../src/lib/fieldCopy.ts';
-import { makeObservationStore, newObservationId, OBS_ENTRY_PREFIX, type StorageLike } from '../src/lib/observation.ts';
-import { makeSequenceStore, defaultSequence } from '../src/lib/vigilSequence.ts';
-import { devSite } from './dev-site.ts';
+
+// The declination module reads __INCLUDE_DEV_SITE__, which Vite injects at build
+// time. In a plain Node gate there is no define, so stand the flag up from the
+// same env var the build uses BEFORE the module is imported — that is what lets
+// this gate exercise BOTH states (flagged: dev entry present; unflagged: absent).
+const INCLUDE_DEV_SITE = process.env.INCLUDE_DEV_SITE === '1';
+(globalThis as Record<string, unknown>).__INCLUDE_DEV_SITE__ = INCLUDE_DEV_SITE;
+
+import type { StorageLike } from '../src/lib/observation.ts';
+
+const { DECLINATION_TABLE, declinationAt, declinationFor, fractionalYear, magneticToTrue, angleDiff } =
+	await import('../src/lib/declination.ts');
+const { FIELD_PALETTE, NIGHT_PALETTE, SURFACE_KEYS, relativeLuminance, isDarkSurface } =
+	await import('../src/lib/fieldPalette.ts');
+const { FIELD_COPY, STEP_LABELS } = await import('../src/lib/fieldCopy.ts');
+const { makeObservationStore, newObservationId, OBS_ENTRY_PREFIX } = await import('../src/lib/observation.ts');
+const { makeSequenceStore, defaultSequence } = await import('../src/lib/vigilSequence.ts');
+const { devSite } = await import('./dev-site.ts');
 
 let failures = 0;
 function check(label: string, ok: boolean, detail: string) {
@@ -75,14 +80,30 @@ console.log('--- DECLINATION / TRUE NORTH ---');
 }
 
 console.log('');
-console.log('--- DECLINATION TABLE vs FIELD-TEST POINT ---');
+console.log(`--- DECLINATION TABLE vs FIELD-TEST POINT (flag ${INCLUDE_DEV_SITE ? 'ON' : 'OFF'}) ---`);
 {
 	const devEntry = DECLINATION_TABLE.find(
 		(e) => Math.hypot(e.latitude - devSite.latitude, e.longitude - devSite.longitude) <= 0.05
 	);
-	check('the field-test point has a measured declination matching dev-site.ts',
-		devEntry !== undefined,
-		devEntry ? `${devEntry.declinationDeg} deg east, ${devEntry.source}` : 'none — the band would fall back on the test device');
+	if (INCLUDE_DEV_SITE) {
+		check('field-test point PRESENT when the dev flag is on (band applies on the test device)',
+			devEntry !== undefined,
+			devEntry ? `${devEntry.declinationDeg} deg east, ${devEntry.source}` : 'MISSING');
+		check('the dev site resolves a declination at its own coordinates (so the band is CORRECTED)',
+			declinationFor(devSite.latitude, devSite.longitude) !== null,
+			`declinationFor(${devSite.latitude}, ${devSite.longitude}) ${declinationFor(devSite.latitude, devSite.longitude) ? 'non-null' : 'null'}`);
+	} else {
+		check('field-test point ABSENT when the dev flag is off (never ships to production)',
+			devEntry === undefined,
+			devEntry ? `LEAKED: ${devEntry.source}` : 'absent');
+		check('the dev site resolves to NO declination when unflagged',
+			declinationFor(devSite.latitude, devSite.longitude) === null, 'null (band would be labelled magnetic)');
+	}
+	check('the band labels a corrected direction "True north"',
+		FIELD_COPY.orientationTrue === 'True north', `orientationTrue='${FIELD_COPY.orientationTrue}'`);
+	check('the canon entry (Callanish) is present in BOTH states',
+		DECLINATION_TABLE.some((e) => Math.hypot(e.latitude - 58.19754, e.longitude - -6.74514) <= 0.05),
+		`${DECLINATION_TABLE.length} entry(ies) in the table`);
 	const src = readFileSync('src/lib/declination.ts', 'utf8');
 	check('the declination module carries no dev-site slug (prod-bundle safety)',
 		!src.includes('devtest'), src.includes('devtest') ? 'FOUND devtest' : 'clean');

@@ -31,7 +31,10 @@ export interface DeclinationEntry {
 	source: string;
 }
 
-export const DECLINATION_TABLE: DeclinationEntry[] = [
+/** The canon declination entries. Only Callanish has a MEASURED value; every
+ *  other canon site has none, so declinationFor() returns null for it and the
+ *  band says so rather than inventing a correction. */
+const CANON_DECLINATION: DeclinationEntry[] = [
 	{
 		latitude: 58.19754,
 		longitude: -6.74514,
@@ -40,18 +43,38 @@ export const DECLINATION_TABLE: DeclinationEntry[] = [
 		// +13.4 arcmin/yr east ~= 0.22333 deg/yr (measured in the conditions round).
 		driftPerYear: 0.22333,
 		source: 'BGS WMM2025 at 58.19754N 6.74514W, alt 0 — Callanish'
-	},
-	{
-		latitude: 56.676,
-		longitude: -3.007,
-		declinationDeg: -0.346,
-		epoch: 2026.716,
-		// Drift for this point was not measured, so it is held at its epoch
-		// rather than extrapolated on an assumed rate.
-		driftPerYear: null,
-		source: 'BGS WMM2025 at 56.676N 3.007W, alt 0 — field-test point'
 	}
 ];
+
+/** DEV-TEST material, not canon: the field-test point's entry. It must not exist
+ *  in a production build — it is gated by the same flag that gates the dev site
+ *  (see DECLINATION_TABLE below). */
+const FIELD_TEST_DECLINATION: DeclinationEntry = {
+	latitude: 56.676,
+	longitude: -3.007,
+	declinationDeg: -0.346,
+	epoch: 2026.716,
+	// Drift for this point was not measured, so it is held at its epoch rather
+	// than extrapolated on an assumed rate.
+	driftPerYear: null,
+	source: 'BGS WMM2025 at 56.676N 3.007W, alt 0 — field-test point'
+};
+
+/** The build flag, injected by Vite from INCLUDE_DEV_SITE. In a plain Node
+ *  context (the gates) there is no define, so the identifier is absent and the
+ *  guard below yields false — the gates stand the global up themselves when they
+ *  want to exercise the flagged state. */
+const INCLUDE_DEV_SITE: boolean =
+	typeof __INCLUDE_DEV_SITE__ !== 'undefined' ? __INCLUDE_DEV_SITE__ : false;
+
+/** The measured declination table, keyed by POSITION (declination is a property
+ *  of where you are, and a slug key would put the field-test slug into the
+ *  production bundle). The field-test entry is DEV-TEST material: it is present
+ *  only when the build carries the dev-only test site, so it never ships.
+ *  The canon entries are unaffected in either state. */
+export const DECLINATION_TABLE: DeclinationEntry[] = INCLUDE_DEV_SITE
+	? [...CANON_DECLINATION, FIELD_TEST_DECLINATION]
+	: CANON_DECLINATION;
 
 /** How close a site must sit to a measured point to inherit its value. */
 export const DECLINATION_MATCH_TOLERANCE_DEG = 0.05;

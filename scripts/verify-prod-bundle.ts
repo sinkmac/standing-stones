@@ -42,6 +42,23 @@ if (process.env.FIELD_TEST === '1') {
 		baddies.length ? baddies.join(', ') : `no '${DEV_SLUG}'`);
 }
 
+// The field-test declination entry is dev-test material and is gated by
+// INCLUDE_DEV_SITE, so it must not reach a production bundle. Its coordinates are
+// the only trace it leaves. The dev site record also carries them, which is why
+// this inverts for an explicit field-test build.
+const FIELD_TEST_COORDS = ['56.676', '3.007'];
+const coordBaddies = files.filter((f) => {
+	const s = readFileSync(f, 'utf8');
+	return FIELD_TEST_COORDS.every((c) => s.includes(c));
+});
+if (process.env.FIELD_TEST === '1') {
+	check('field-test coordinates present for an EXPLICIT field-test build', coordBaddies.length > 0,
+		`${coordBaddies.length} file(s)`);
+} else {
+	check('no field-test coordinates anywhere in the production bundle', coordBaddies.length === 0,
+		coordBaddies.length ? coordBaddies.join(', ') : 'none');
+}
+
 // Specific to OUR registration: the call AND our versioned SW url together.
 // (A bare /serviceWorker\.register/ also matches SvelteKit's own runtime string
 //  `navigator.serviceWorker.register(sanitised${opts})`, and our SW file's comment.)
