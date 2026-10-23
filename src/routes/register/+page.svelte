@@ -1,12 +1,14 @@
 <script lang="ts">
+	import { VIGIL_STATES, vigilCountLine, vigilZeroState, vigilRemoteLine } from '$lib/registerCopy';
+
 	let { data } = $props();
 
-	let sites = $derived(data.sites);
+	let registers = $derived(data.registers);
 	let recentVigils = $derived(data.recentVigils);
 
 	let nameBySlug = $derived(
-		sites.reduce<Record<string, string>>((acc, site) => {
-			acc[site.slug] = site.name;
+		registers.reduce<Record<string, string>>((acc, r) => {
+			acc[r.site.slug] = r.site.name;
 			return acc;
 		}, {})
 	);
@@ -26,13 +28,18 @@
 <section class="site-index">
 	<h2>The sites</h2>
 	<ul>
-		{#each sites as site}
+		{#each registers as { site, tally, body }}
 			<li>
 				<a href="/{site.slug}">{site.name}</a>
 				<span class="region">{site.region}</span>
+				<p class="count">
+					{tally.kept > 0 ? vigilCountLine(tally.kept, tally.saw, tally.cloud, body) : vigilZeroState()}
+					{vigilRemoteLine(tally.remote)}
+				</p>
 			</li>
 		{/each}
 	</ul>
+	<p class="note">Times, places and what people saw are as reported. The register takes them on trust.</p>
 </section>
 
 <section class="recent">
@@ -47,6 +54,7 @@
 					—
 					{v.sawEvent ? 'Saw it' : v.sawEvent === false ? "Didn't see it" : 'Uncertain'}
 					{#if v.keeperName} · {v.keeperName}{/if}
+					{#if v.vigilState} · {VIGIL_STATES[v.vigilState]}{/if}
 				</p>
 				<blockquote>{v.observation}</blockquote>
 			</div>
@@ -78,7 +86,17 @@
 		margin: 0 0 1.5rem 0;
 	}
 	.site-index li {
-		margin: 0.25rem 0;
+		margin: 0.5rem 0;
+	}
+	.count {
+		margin: 0.1rem 0 0 0;
+		font-size: 0.85rem;
+		color: #5a5550;
+	}
+	.note {
+		font-size: 0.85rem;
+		color: #7a7670;
+		margin: -0.75rem 0 1.5rem 0;
 	}
 	.site-index a {
 		color: #1a1a1a;

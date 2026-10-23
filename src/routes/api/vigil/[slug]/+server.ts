@@ -1,6 +1,7 @@
 import { json } from '@sveltejs/kit';
 import { recordVigil, getVigilsForSite, getSiteVigilStats } from '$lib/server/vigil';
 import { getSite } from '$lib/server/sites';
+import { isVigilState } from '$lib/registerCopy';
 
 export async function POST({ params, request }) {
 	const site = getSite(params.slug);
@@ -24,7 +25,8 @@ export async function POST({ params, request }) {
 		sawEvent: body.sawEvent === undefined ? null : Boolean(body.sawEvent),
 		observation: body.observation.trim(),
 		weather: body.weather || 'other',
-		keeperName: body.keeperName || undefined
+		keeperName: body.keeperName || undefined,
+		vigilState: isVigilState(body.vigilState) ? body.vigilState : undefined
 	});
 
 	const stats = await getSiteVigilStats(site.slug);

@@ -2,6 +2,7 @@
 // Store type: site-scoped (survives redeploys) — entries accumulate over years
 
 import { getStore } from '@netlify/blobs';
+import type { VigilState } from '$lib/registerCopy';
 
 export interface VigilEntry {
 	id: string;
@@ -13,6 +14,8 @@ export interface VigilEntry {
 	observation: string;
 	weather: 'clear' | 'partly-cloudy' | 'overcast' | 'rain' | 'other';
 	keeperName?: string;
+	/** Self-reported; absent on entries made before the question was asked. */
+	vigilState?: VigilState;
 	createdAt: string;
 }
 

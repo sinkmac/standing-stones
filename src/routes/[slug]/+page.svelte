@@ -1,6 +1,7 @@
 <script lang="ts">
 	import HeroSky from '$lib/components/HeroSky.svelte';
 	import FieldInstrument from '$lib/components/FieldInstrument.svelte';
+	import { VIGIL_STATES, type VigilState } from '$lib/registerCopy';
 
 	let { data } = $props();
 
@@ -16,6 +17,7 @@
 	let keeperName = $state('');
 	let sawEvent = $state<string | null>(null);
 	let weather = $state('clear');
+	let vigilState = $state<VigilState | null>(null);
 	let submitted = $state(false);
 	let submitError = $state('');
 
@@ -37,6 +39,7 @@
 					keeperName: keeperName.trim() || undefined,
 					sawEvent: sawEvent === null ? null : sawEvent === 'yes',
 					weather,
+					vigilState: vigilState ?? undefined,
 					alignmentType: site.alignments[0]?.type || 'unknown'
 				})
 			});
@@ -51,6 +54,7 @@
 			observation = '';
 			keeperName = '';
 			sawEvent = null;
+			vigilState = null;
 		} catch (e) {
 			submitError = 'Network error. Try again.';
 		}
@@ -270,6 +274,16 @@
 				{#if submitError}
 					<p class="form-error">{submitError}</p>
 				{/if}
+
+				<label>
+					Where were you?
+					<select bind:value={vigilState}>
+						<option value={null}>Rather not say</option>
+						{#each Object.entries(VIGIL_STATES) as [key, label]}
+							<option value={key}>{label.charAt(0).toUpperCase() + label.slice(1)}</option>
+						{/each}
+					</select>
+				</label>
 
 				<label>
 					Did you see the alignment?
