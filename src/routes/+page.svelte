@@ -727,11 +727,11 @@
 			</div>
 		</div>
 		<div class="hero-bottom">
-			<span>01 / STONEHENGE <small>WILTSHIRE, ENGLAND · 51.18° N</small></span>
+			<span>01 / BALLOCHROY <small>KINTYRE, SCOTLAND · 55.71° N</small></span>
 			<span class="hero-scroll">SCROLL TO DISCOVER ↓</span>
 			<a href="#season" class="next-event">
 				<span class="sun-icon">☼</span>
-				<span>NEXT SEASONAL MILESTONE<strong>Winter solstice <b id="countdown"></b></strong></span>
+				<span>NEXT SEASONAL MILESTONE<strong>Next alignment <b id="countdown"></b></strong></span>
 				<span>↗</span>
 			</a>
 		</div>
@@ -1059,7 +1059,7 @@
 		height: 95svh;
 		max-height: 1100px;
 		position: relative;
-		background: #35433d url('/images/standing-stones/stonehenge.jpg') center 52%/cover;
+		background: #35433d url('/images/standing-stones/ballochroy.jpg') center 52%/cover;
 		isolation: isolate;
 	}
 	.hero-shade {
