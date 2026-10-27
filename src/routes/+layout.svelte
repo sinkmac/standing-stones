@@ -1,77 +1,40 @@
 <script lang="ts">
-	import { page } from '$app/state';
 	let { children } = $props();
 </script>
 
 <svelte:head>
-	<meta name="description" content="Countdown and witness tool for solar and lunar alignments at standing stones and stone circles." />
+	<meta name="description" content="Standing Stones — ancient places, extraordinary light." />
 </svelte:head>
-
-{#if page.url.pathname !== '/'}
-	<header>
-		<a href="/" class="site-title">Standing Stones & Alignments</a>
-		<nav>
-			<a href="/">Sites</a>
-		</nav>
-	</header>
-{/if}
 
 <main>
 	{@render children()}
 </main>
 
-<footer>
-	<p>Not a heritage directory. A countdown and witness tool for the sky.</p>
-	<p>Non-events are valid entries. Going and seeing nothing still counts.</p>
+<footer class="app-footer">
+	<p>Ancient places. Extraordinary light.</p>
+	<p>A field guide for the curious. Leave the stones as you found them.</p>
 </footer>
 
 <style>
+	@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap');
+
 	:global(body) {
-		font-family: Georgia, 'Times New Roman', Times, serif;
-		max-width: min(54ch, 96vw);
-		margin: 0 auto;
-		padding: 1rem;
-		background: #faf9f5;
-		color: #1a1a1a;
+		margin: 0;
+		background: #111d1e;
+		color: #f0ede3;
+		font: 15px/1.65 'DM Sans', Arial, sans-serif;
 		line-height: 1.6;
 	}
+	h1, h2, h3 { margin-top: 0 }
 
-	header {
-		border-bottom: 1px solid #d4d0c8;
-		padding-bottom: 0.75rem;
-		margin-bottom: 1.5rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-	}
+	main { min-height: 60vh }
 
-	.site-title {
-		font-size: 1.25rem;
-		font-weight: normal;
-		text-decoration: none;
-		color: #1a1a1a;
+	.app-footer {
+		margin-top: 4rem;
+		padding: 3rem 6%;
+		border-top: 1px solid #ffffff20;
+		font-size: 12px;
+		color: #a9b4ad;
 	}
-
-	nav a {
-		margin-left: 1rem;
-		color: #5a5550;
-		text-decoration: none;
-		font-size: 0.9rem;
-	}
-
-	nav a:hover {
-		color: #1a1a1a;
-	}
-
-	footer {
-		margin-top: 3rem;
-		padding-top: 1rem;
-		border-top: 1px solid #d4d0c8;
-		font-size: 0.8rem;
-		color: #7a7670;
-	}
-
-	footer p {
-		margin: 0.25rem 0;
-	}
+	.app-footer p { margin: 0.25rem 0 }
 </style>

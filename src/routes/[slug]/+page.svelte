@@ -37,8 +37,8 @@
 					keeperName: keeperName.trim() || undefined,
 					sawEvent: sawEvent === null ? null : sawEvent === 'yes',
 					weather,
-					alignmentType: site.alignments[0]?.type || 'unknown'
-				})
+					alignmentType: site.alignments[0]?.type || 'unknown',
+				}),
 			});
 
 			if (!res.ok) {
@@ -80,7 +80,7 @@
 		}
 
 		const skyObs = new IntersectionObserver((entries) => {
-			entries.forEach(e => {
+			entries.forEach((e) => {
 				if (e.intersectionRatio >= 0.3) {
 					e.target.classList.add('sky-dark');
 				} else {
@@ -95,7 +95,7 @@
 		let countdownDone = false;
 		const cdEl = document.querySelector('.countdown');
 		const cdObs = new IntersectionObserver((entries) => {
-			entries.forEach(e => {
+			entries.forEach((e) => {
 				if (e.isIntersecting && !countdownDone) {
 					countdownDone = true;
 					e.target.classList.remove('countdown-hidden');
@@ -143,10 +143,21 @@
 	<title>{site.name} — Standing Stones & Alignments</title>
 </svelte:head>
 
+<header class="site-page-header">
+	<div class="site-page-header-inner">
+		<a class="brand" href="/">
+			<span class="brand-icon">◒</span>
+			<span>STANDING<br>STONES</span>
+		</a>
+		<nav class="site-page-nav" aria-label="Main navigation">
+			<a href="#explore">Explore the stones</a>
+		</nav>
+	</div>
+</header>
+
 {#if ['callanish', 'ballochroy', 'drombeg', 'maeshowe', 'newgrange', 'clava-cairns'].includes(site.slug)}
 	<FieldInstrument {data} />
 {:else}
-
 	<HeroSky bands={skyBands} siteId={site.slug} />
 
 	<a href="/" class="back-link">← All sites</a>
@@ -194,7 +205,6 @@
 	<section class="countdown countdown-hidden">
 		<h2>Next alignment</h2>
 		{#if !hasAlignment}
-			<!--- NO-ALIGNMENT FALLBACK PROMPT -->
 			<div class="no-alignment">
 				<p>This site has no documented alignment in the current canon.</p>
 				<p>That doesn't mean nothing is happening in the sky.</p>
@@ -230,20 +240,20 @@
 	</section>
 
 	<!-- ANCESTRAL-SKY DRIFT (only for eligible sites) -->
-		{#if ancestralSky}
-			<section class="ancestral-sky">
-				<h2>Ancestral sky</h2>
-				<p class="guardrail">{ancestralSky.guardrail}</p>
-				<div class="band-description">
-					<p><strong>Drift across the construction window:</strong> {ancestralSky.bandDescription}</p>
-				</div>
-				{#if ancestralSky.scrubAvailable}
-					<p class="scrub-note">The optional date scrub control can show specific star positions within this window.</p>
-				{/if}
-			</section>
-		{/if}
+	{#if ancestralSky}
+		<section class="ancestral-sky">
+			<h2>Ancestral sky</h2>
+			<p class="guardrail">{ancestralSky.guardrail}</p>
+			<div class="band-description">
+				<p><strong>Drift across the construction window:</strong> {ancestralSky.bandDescription}</p>
+			</div>
+			{#if ancestralSky.scrubAvailable}
+				<p class="scrub-note">The optional date scrub control can show specific star positions within this window.</p>
+			{/if}
+		</section>
+	{/if}
 
-		<!-- VIGIL STATS -->
+	<!-- VIGIL STATS -->
 	{#if vigilStats.total > 0}
 		<section class="vigil-stats">
 			<h2>Vigil register</h2>
@@ -325,391 +335,278 @@
 			{/each}
 		</section>
 	{/if}
-
 {/if}
 
 <style>
-	.back-link {
-		font-size: 0.85rem;
-		color: #5a5550;
-		text-decoration: none;
-	}
+	@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap');
 
-	.back-link:hover {
-		color: #1a1a1a;
+	:root {
+		--bg: #111d1e;
+		--panel: #172628;
+		--ink: #f0ede3;
+		--muted: #a9b4ad;
+		--gold: #e3bf82;
+		--line: #ffffff20;
+		--serif: 'Libre Caslon Display', Georgia, serif;
+		--sans: 'DM Sans', Arial, sans-serif;
 	}
-
-	.site-header {
-		margin: 0.5rem 0 0.75rem 0;
-	}
-
-	.site-header h1 {
+	* { box-sizing: border-box }
+	body {
 		margin: 0;
-		font-size: 1.5rem;
+		background: var(--bg);
+		color: var(--ink);
+		font: 15px/1.65 var(--sans);
 	}
+	h1, h2, h3 { margin-top: 0 }
+	h1 { font: clamp(40px, 4.8vw, 56px) / 1.05 var(--serif); letter-spacing: -1px; margin-bottom: 24px }
+	h2 { font: clamp(24px, 3vw, 32px) / 1.15 var(--serif); letter-spacing: -0.5px; margin-bottom: 16px }
+	h3 { font: 16px / 1.2 var(--serif); margin-bottom: 8px; color: var(--ink) }
+	p { color: var(--muted) }
+	a { color: var(--gold) }
+	button, a { -webkit-tap-highlight-color: transparent }
 
-	.alt-name {
-		font-style: italic;
-		color: #5a5550;
-		margin: 0.25rem 0 0 0;
+	.site-page-header {
+		height: 105px;
+		padding: 0 6%;
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		border-bottom: 1px solid var(--line);
+		background: linear-gradient(#0b171bc0, transparent);
 	}
-
-	.region {
-		color: #7a7670;
-		font-size: 0.85rem;
-		margin: 0.25rem 0 0.5rem 0;
-	}
-
-	.badges {
+	.site-page-header-inner {
 		display: flex;
-		gap: 0.4rem;
-		margin-bottom: 0.5rem;
+		align-items: center;
+		justify-content: space-between;
+		height: 105px;
 	}
+	.brand {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		line-height: 1.05;
+		letter-spacing: 2px;
+		font-size: 17px;
+		font-weight: 500;
+	}
+	.brand-icon { font-size: 55px; line-height: 1; color: var(--gold); font-weight: 400 }
+	.site-page-nav { display: flex; gap: 34px; font-size: 12px }
+	.site-page-nav a { border-bottom: 1px solid #fff6; padding: 9px 0; color: var(--ink) }
+	.site-page-nav a:hover { color: var(--gold) }
 
+	.back-link { font-size: 0.85rem; color: var(--muted); text-decoration: none }
+	.back-link:hover { color: var(--gold) }
+
+	.site-header { margin: 0.5rem 0 0.75rem 0 }
+	.site-header h1 { margin: 0; font-size: 2rem }
+	.alt-name { font-style: italic; color: var(--gold); margin: 0.25rem 0 0 0 }
+	.region { color: var(--muted); font-size: 0.85rem; margin: 0.25rem 0 0.5rem 0 }
+	.badges { display: flex; gap: 0.4rem; margin-bottom: 0.5rem }
 	.badge {
 		font-size: 0.7rem;
 		padding: 0.1rem 0.4rem;
 		border-radius: 3px;
 		text-transform: uppercase;
 		letter-spacing: 0.03em;
+		border: 1px solid var(--line);
+		color: var(--muted);
+		background: #ffffff0d;
 	}
+	.badge-surveyed { border-color: #7aa37a55; color: #a3c2a3 }
+	.badge-traditional { border-color: #c4b08a55; color: #c4b08a }
+	.badge-marquee { border-color: #a3a3c455; color: #c2c2d3 }
 
-	.badge-surveyed {
-		background: #e8f0e8;
-		color: #3a6a3a;
-		border: 1px solid #b0ccb0;
-	}
-
-	.badge-traditional {
-		background: #f0ece8;
-		color: #8a6a3a;
-		border: 1px solid #d0c4b0;
-	}
-
-	.badge-marquee {
-		background: #e8e4f0;
-		color: #5a4a7a;
-		border: 1px solid #c4bcd0;
-	}
-
-	.description {
-		font-size: 0.95rem;
-		margin-bottom: 1rem;
-	}
+	.description { font-size: 14px; margin-bottom: 1rem; line-height: 1.7 }
 
 	.access {
-		font-size: 0.85rem;
-		color: #5a5550;
+		font-size: 13px;
+		color: var(--muted);
 		margin-bottom: 1.5rem;
-		padding: 0.75rem;
-		background: #f4f2ee;
-		border-radius: 4px;
+		padding: 1rem;
+		background: #172628;
+		border-radius: 6px;
+		border: 1px solid var(--line);
 	}
+	.access h3 { margin: 0 0 0.25rem 0; font-size: 13px }
+	.access p { margin: 0.2rem 0 }
+	.access-note { color: var(--gold); font-weight: 600 }
 
-	.access h3 {
-		margin: 0 0 0.25rem 0;
-		font-size: 0.9rem;
-	}
-
-	.access p {
-		margin: 0.2rem 0;
-	}
-
-	.access-note {
-		color: #8a6a3a;
-		font-weight: 600;
-	}
-
-	.countdown {
-		margin-bottom: 1.5rem;
-	}
-
-	.countdown h2 {
-		font-size: 1.1rem;
-		margin-bottom: 0.5rem;
-	}
+	.countdown { margin-bottom: 1.5rem }
+	.countdown h2 { font-size: 1.1rem; margin-bottom: 0.5rem }
 
 	.folklore-notice {
-		font-size: 0.85rem;
-		padding: 0.5rem 0.75rem;
-		background: #f0ece8;
-		border-left: 3px solid #d0c4b0;
+		font-size: 13px;
+		padding: 0.75rem 1rem;
+		background: #172628;
+		border-left: 3px solid var(--gold);
 		margin-bottom: 0.75rem;
 		border-radius: 2px;
+		border: 1px solid var(--line);
 	}
 
 	.event-card {
-		padding: 0.75rem;
-		background: #f4f2ee;
-		border-radius: 4px;
+		padding: 1rem;
+		background: #172628;
+		border-radius: 6px;
 		margin-bottom: 0.5rem;
+		border: 1px solid var(--line);
 	}
-
 	.event-badge {
-		font-size: 0.8rem;
-		color: #3a6a3a;
+		font-size: 11px;
+		color: var(--gold);
 		margin: 0 0 0.25rem 0;
-		font-family: monospace;
+		font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+		letter-spacing: 0.5px;
 	}
-
-	.event-date {
-		font-size: 0.95rem;
-		font-weight: 600;
-		margin: 0 0 0.25rem 0;
-	}
-
-	.event-desc {
-		font-size: 0.85rem;
-		color: #5a5550;
-		margin: 0;
-	}
+	.event-date { font-size: 14px; font-weight: 600; margin: 0 0 0.25rem 0; color: var(--ink) }
+	.event-desc { font-size: 13px; color: var(--muted); margin: 0 }
 
 	.no-alignment {
 		padding: 1rem;
-		background: #f4f2ee;
-		border-radius: 4px;
-		border-left: 3px solid #8a8578;
+		background: #172628;
+		border-radius: 6px;
+		border-left: 3px solid var(--muted);
+		border: 1px solid var(--line);
 	}
 
-	.sky-summary {
-		font-size: 0.9rem;
-		margin: 0.5rem 0;
-	}
+	.sky-summary { font-size: 13px; margin: 0.5rem 0 }
+	.keep-prompt { font-style: italic; color: var(--muted) }
 
-	.keep-prompt {
-		font-style: italic;
-		color: #5a5550;
-	}
-
-	.vigil-stats {
-		margin-bottom: 1.5rem;
-	}
-
-	.vigil-stats h2 {
-		font-size: 1.1rem;
-		margin-bottom: 0.5rem;
-	}
-
+	.vigil-stats { margin-bottom: 1.5rem }
+	.vigil-stats h2 { font-size: 1.1rem; margin-bottom: 0.5rem }
 	.stats-banner {
 		display: flex;
 		gap: 1.5rem;
-		font-size: 0.9rem;
-		padding: 0.75rem;
-		background: #e8f0e8;
-		border-radius: 4px;
+		font-size: 13px;
+		padding: 1rem;
+		background: #172628;
+		border-radius: 6px;
+		border: 1px solid var(--line);
 	}
-
-	.stats-banner p {
-		margin: 0;
-	}
+	.stats-banner p { margin: 0 }
 
 	.vigil-form {
 		margin-bottom: 1.5rem;
-		padding: 1rem;
-		background: #f4f2ee;
-		border-radius: 4px;
+		padding: 1.5rem;
+		background: #172628;
+		border-radius: 6px;
+		border: 1px solid var(--line);
 	}
+	.vigil-form h2 { font-size: 1.1rem; margin: 0 0 0.25rem 0 }
+	.form-intro { font-size: 13px; color: var(--muted); margin: 0 0 1rem 0 }
+	.form-error { color: #c47f7f; font-size: 12px; padding: 0.5rem; background: #2a1d1d; border-radius: 3px; border: 1px solid #4a2a2a }
 
-	.vigil-form h2 {
-		font-size: 1.1rem;
-		margin: 0 0 0.25rem 0;
-	}
-
-	.form-intro {
-		font-size: 0.85rem;
-		color: #5a5550;
-		margin: 0 0 0.75rem 0;
-	}
-
-	.form-error {
-		color: #8a3a3a;
-		font-size: 0.85rem;
-		padding: 0.4rem;
-		background: #f0e4e4;
-		border-radius: 3px;
-	}
-
-	label {
-		display: block;
-		font-size: 0.85rem;
-		margin-bottom: 0.5rem;
-		color: #5a5550;
-	}
-
-	.required {
-		color: #8a3a3a;
-	}
+	label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 0.5rem }
+	.required { color: var(--gold) }
 
 	select, input, textarea {
 		display: block;
 		width: 100%;
 		margin-top: 0.15rem;
-		padding: 0.35rem 0.5rem;
-		font-family: Georgia, serif;
-		font-size: 0.9rem;
-		border: 1px solid #d4d0c8;
-		border-radius: 3px;
-		background: white;
+		padding: 0.5rem;
+		font-family: inherit;
+		font-size: 13px;
+		border: 1px solid var(--line);
+		border-radius: 4px;
+		background: #0b171b;
+		color: var(--ink);
 		box-sizing: border-box;
 	}
-
-	textarea {
-		resize: vertical;
-	}
+	select option { background: #0b171b; color: var(--ink) }
+	textarea { resize: vertical }
 
 	button {
 		margin-top: 0.5rem;
 		padding: 0.5rem 1rem;
-		font-family: Georgia, serif;
-		font-size: 0.9rem;
-		background: #1a1a1a;
-		color: #faf9f5;
-		border: none;
-		border-radius: 3px;
+		font-size: 13px;
+		background: #ffffff12;
+		color: var(--ink);
+		border: 1px solid var(--line);
+		border-radius: 4px;
 		cursor: pointer;
 	}
-
-	button:hover {
-		background: #3a3a3a;
-	}
+	button:hover { border-color: var(--gold) }
 
 	.success {
-		padding: 0.75rem;
-		background: #e8f0e8;
+		padding: 1rem;
+		background: #172628;
 		border-radius: 4px;
+		border: 1px solid var(--line);
 	}
+	.success p { margin: 0 0 0.5rem 0 }
 
-	.success p {
-		margin: 0 0 0.5rem 0;
-	}
-
-	.success button {
-		background: #3a6a3a;
-	}
-
-	.vigil-log {
-		margin-bottom: 1.5rem;
-	}
-
-	.vigil-log h2 {
-		font-size: 1.1rem;
-		margin-bottom: 0.5rem;
-	}
-
+	.vigil-log { margin-bottom: 1.5rem }
+	.vigil-log h2 { font-size: 1.1rem; margin-bottom: 0.5rem }
 	.vigil-entry {
-		padding: 0.5rem 0;
-		border-bottom: 1px solid #eae8e4;
+		padding: 0.75rem 0;
+		border-bottom: 1px solid var(--line);
 	}
-
-	.vigil-entry:last-child {
-		border-bottom: none;
-	}
-
-	.vigil-meta {
-		font-size: 0.8rem;
-		color: #7a7670;
-		margin: 0 0 0.25rem 0;
-	}
-
+	.vigil-entry:last-child { border-bottom: none }
+	.vigil-meta { font-size: 11px; color: var(--muted); margin: 0 0 0.25rem 0 }
 	blockquote {
 		margin: 0;
-		font-size: 0.9rem;
-		color: #3a3a3a;
+		font-size: 13px;
+		color: var(--ink);
 		font-style: italic;
-		padding-left: 0.5rem;
-		border-left: 2px solid #d4d0c8;
+		padding-left: 0.75rem;
+		border-left: 2px solid var(--gold);
 	}
 
-	.error {
-		text-align: center;
-		padding: 2rem;
-	}
+	.error { text-align: center; padding: 2rem }
 
 	.ancestral-sky {
 		margin-bottom: 1.5rem;
-		padding: 0.75rem;
-		background: #eeecf0;
+		padding: 1rem;
+		background: #172628;
 		border-radius: 4px;
-		border-left: 3px solid #9a8ab0;
+		border-left: 3px solid #8a7ca3;
+		border: 1px solid var(--line);
 	}
-
-	.ancestral-sky h2 {
-		font-size: 1.1rem;
-		margin: 0 0 0.5rem 0;
-	}
-
+	.ancestral-sky h2 { font-size: 1.1rem; margin: 0 0 0.5rem 0 }
 	.guardrail {
-		font-size: 0.85rem;
+		font-size: 12px;
 		font-style: italic;
-		color: #5a4a7a;
+		color: #bca3c4;
 		margin: 0 0 0.5rem 0;
 		line-height: 1.5;
 	}
+	.band-description { font-size: 13px; margin-bottom: 0.25rem }
+	.band-description p { margin: 0 }
+	.scrub-note { font-size: 11px; color: var(--muted); margin: 0.25rem 0 0 0 }
 
-	.band-description {
-		font-size: 0.9rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.band-description p {
-		margin: 0;
-	}
-
-	.scrub-note {
-		font-size: 0.8rem;
-		color: #7a7670;
-		margin: 0.25rem 0 0 0;
-	}
-
-	.before-you-go {
-		margin-bottom: 1.5rem;
-	}
-
-	.before-you-go h3 {
-		font-size: 1.1rem;
-		margin: 0 0 0.5rem 0;
-	}
-
+	.before-you-go { margin-bottom: 1.5rem }
+	.before-you-go h3 { font-size: 1.1rem; margin: 0 0 0.5rem 0 }
 	.enrichment-approach {
-		font-size: 0.85rem;
-		color: #5a5550;
+		font-size: 13px;
+		color: var(--muted);
 		margin-bottom: 1.5rem;
-		padding: 0.75rem;
-		background: #f4f2ee;
+		padding: 1rem;
+		background: #172628;
 		border-radius: 4px;
+		border: 1px solid var(--line);
 	}
-
-	.enrichment-approach p {
-		margin: 0;
-	}
+	.enrichment-approach p { margin: 0 }
 
 	.enrichment-dark-sky {
-		font-size: 0.85rem;
-		color: #5a5550;
+		font-size: 13px;
+		color: var(--muted);
 		margin-bottom: 1.5rem;
-		padding: 0.75rem;
-		background: #f0f0ec;
+		padding: 1rem;
+		background: #172628;
 		border-radius: 4px;
-		border-left: 3px solid #9a9a8a;
+		border-left: 3px solid #8a9a9a;
+		border: 1px solid var(--line);
 		transition: background 0.8s ease, border-color 0.8s ease;
 		position: relative;
 		overflow: hidden;
 	}
-
-	.enrichment-dark-sky p {
-		margin: 0;
-	}
-
+	.enrichment-dark-sky p { margin: 0 }
 	.enrichment-dark-sky.sky-dark {
 		background: #0d1117;
 		border-color: #2a3040;
 		border-left-color: #3a4a60;
 	}
-
-	:global(.enrichment-dark-sky.sky-dark) p {
-		color: #a0bcd0;
-		transition: color 0.8s ease;
-	}
+	:global(.enrichment-dark-sky.sky-dark) p { color: #a0bcd0; transition: color 0.8s ease }
 
 	.star-field {
 		position: absolute;
@@ -718,22 +615,13 @@
 		opacity: 0;
 		transition: opacity 1.2s ease;
 	}
-
 	.star-field .star {
 		position: absolute;
-		width: 2px;
-		height: 2px;
+		width: 2px; height: 2px;
 		border-radius: 50%;
 		background: white;
 	}
+	.enrichment-dark-sky.sky-dark .star-field { opacity: 1 }
 
-	.enrichment-dark-sky.sky-dark .star-field {
-		opacity: 1;
-	}
-
-	.countdown-hidden {
-		opacity: 0;
-		transform: translateY(16px);
-		transition: opacity 0.9s ease, transform 0.9s ease;
-	}
+	.countdown-hidden { opacity: 0; transform: translateY(16px); transition: opacity 0.9s ease, transform 0.9s ease }
 </style>
