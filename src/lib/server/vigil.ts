@@ -151,20 +151,6 @@ export async function getAllVigils(): Promise<VigilEntry[]> {
 }
 
 /**
- * Delete a single vigil entry by its unique ID. Returns true if an entry
- * was deleted, false if the ID was not found.
- */
-export async function deleteVigil(id: string): Promise<boolean> {
-	const entries = await loadEntries();
-	const filtered = entries.filter(e => e.id !== id);
-	if (filtered.length === entries.length) {
-		return false; // entry not found
-	}
-	await saveEntries(filtered);
-	return true;
-}
-
-/**
  * Get the count of keepers for a specific upcoming alignment event.
  */
 export async function getKeepersForAlignment(siteSlug: string, alignmentType: string): Promise<number> {
