@@ -1,5 +1,5 @@
 import { json } from '@sveltejs/kit';
-import { recordVigil, getVigilsForSite, getSiteVigilStats } from '$lib/server/vigil';
+import { recordVigil, getVigilsForSite, getSiteVigilStats, deleteVigil } from '$lib/server/vigil';
 import { getSite } from '$lib/server/sites';
 
 export async function POST({ params, request }) {
@@ -44,4 +44,24 @@ export async function GET({ params }) {
 	]);
 
 	return json({ vigils, stats });
+}
+
+export async function DELETE({ params, request }) {
+	const site = getSite(params.slug);
+	if (!site) {
+		return json({ error: 'Site not found' }, { status: 404 });
+	}
+
+	const body = await request.json();
+	if (!body.id || typeof body.id !== 'string') {
+		return json({ error: 'Entry id is required' }, { status: 400 });
+	}
+
+	const deleted = await deleteVigil(body.id);
+	if (!deleted) {
+		return json({ error: 'Entry not found' }, { status: 404 });
+	}
+
+	const stats = await getSiteVigilStats(site.slug);
+	return json({ deleted: body.id, stats });
 }
