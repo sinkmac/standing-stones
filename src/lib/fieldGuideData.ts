@@ -69,7 +69,7 @@ export const fieldGuideSites: FieldGuideSite[] = [
 		date: null,
 		source: 'https://www.english-heritage.org.uk/visit/places/stonehenge/things-to-do/solstice/',
 		sourceName: 'English Heritage',
-		image: 'stonehenge.jpg',
+		image: '',   // stonehenge.jpg — Zaxx / Unsplash (credit retained below); image file not yet obtained, plan drawing fallback used
 	},
 	{
 		slug: 'callanish',
